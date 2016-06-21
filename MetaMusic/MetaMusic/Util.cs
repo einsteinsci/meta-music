@@ -27,7 +27,7 @@ namespace MetaMusic
 
 		public static ImageSource LoadImage(string path)
 		{
-			return new BitmapImage(new Uri("pack://application:,,,/MetaMusic;component/{2}".Fmt(path)));
+			return new BitmapImage(new Uri("pack://application:,,,/MetaMusic;component/{0}".Fmt(path)));
 		}
 	}
 }

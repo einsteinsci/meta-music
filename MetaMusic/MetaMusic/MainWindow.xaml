@@ -16,7 +16,8 @@
                          Click="PlayThumbBtn_OnClick" />
         <ThumbButtonInfo x:Name="StopThumbBtn"
                          Description="Stop"
-                         ImageSource="Assets/stop.png"/>
+                         ImageSource="Assets/stop.png"
+                         Click="StopThumbBtn_OnClick"/>
       </TaskbarItemInfo.ThumbButtonInfos>
     </TaskbarItemInfo>
   </Window.TaskbarItemInfo>

@@ -94,13 +94,13 @@ namespace MetaMusic
 				{
 					FilePlayer.Play(MusicPathBox.Text);
 					UpdateTitleBar();
-					UpdatePlayBtn("Play");
+					UpdatePlayBtn("Pause");
 				}
 			}
 			else
 			{
 				FilePlayer.TogglePause();
-				UpdatePlayBtn(FilePlayer.Source.IsPlaying ? "Pause" : "Play");
+				UpdatePlayBtn(FilePlayer.Source.IsPlaying ? "Pause" : "Resume");
 			}
 
 		}
@@ -115,6 +115,11 @@ namespace MetaMusic
 		private void PlayThumbBtn_OnClick(object sender, EventArgs e)
 		{
 			PlayBtn_OnClick(sender, null);
+		}
+
+		private void StopThumbBtn_OnClick(object sender, EventArgs e)
+		{
+			StopBtn_OnClick(sender, null);
 		}
 	}
 }
