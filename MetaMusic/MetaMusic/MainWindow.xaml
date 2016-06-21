@@ -1,0 +1,47 @@
+﻿<Window x:Class="MetaMusic.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MetaMusic"
+        mc:Ignorable="d"
+        Title="Meta Music Player" Height="350" Width="525"
+        Icon="icon.ico">
+  <Window.TaskbarItemInfo>
+    <TaskbarItemInfo>
+      <TaskbarItemInfo.ThumbButtonInfos>
+        <ThumbButtonInfo x:Name="PlayThumbBtn"
+                         Description="Play"
+                         ImageSource="Assets/play.png"
+                         Click="PlayThumbBtn_OnClick" />
+        <ThumbButtonInfo x:Name="StopThumbBtn"
+                         Description="Stop"
+                         ImageSource="Assets/stop.png"/>
+      </TaskbarItemInfo.ThumbButtonInfos>
+    </TaskbarItemInfo>
+  </Window.TaskbarItemInfo>
+  
+  <Grid>
+    <StackPanel>
+      <TextBox x:Name="MusicPathBox"
+               Margin="5"
+               Text="C:\Users\sealedinterface\OneDrive\Music\Captain-Cool.mp3"/>
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Center">
+        <Button x:Name="PlayBtn"
+                Content="Play"
+                Margin="5"
+                Width="72"
+                Click="PlayBtn_OnClick" />
+        <Button x:Name="StopBtn"
+                Content="Stop"
+                Margin="5"
+                Width="72"
+                Click="StopBtn_OnClick"/>
+      </StackPanel>
+      <TextBlock x:Name="StatusTxt"
+                 Text="No file playing."
+                 HorizontalAlignment="Center"/>
+    </StackPanel>
+  </Grid>
+</Window>
