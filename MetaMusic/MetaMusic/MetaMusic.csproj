@@ -39,8 +39,32 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.2.4.0\lib\net45\MahApps.Metro.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NAudio, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.1.7.3\lib\net35\NAudio.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ookii.Dialogs.Wpf, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0c15020868fd6249, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ookii.Dialogs.1.0\lib\net35\Ookii.Dialogs.Wpf.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SoundCloud.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\SoundCloud.Api.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.2.4.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -64,7 +88,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="FlashWindowHelper.cs" />
+    <Compile Include="ILastException.cs" />
+    <Compile Include="Players\SoundCloudPlayer.cs" />
+    <Compile Include="Players\VersatilePlayer.cs" />
+    <Compile Include="PlayListItem.cs" />
+    <Compile Include="Sources\SoundCloudMusic.cs" />
     <Compile Include="Util.cs" />
+    <Compile Include="WebMusicHelper.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -115,11 +145,29 @@
     <Resource Include="icon.ico" />
     <Resource Include="icon.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="IconSources.txt" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\pause.png" />
     <Resource Include="Assets\play.png" />
     <Resource Include="Assets\stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\minus.png" />
+    <Resource Include="Assets\next.png" />
+    <Resource Include="Assets\previous.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\fedora.png" />
+    <Resource Include="Assets\plus.png" />
+    <Resource Include="Assets\repeat.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\powered-by-soundcloud.png" />
+    <Resource Include="Assets\soundcloud-logo.png" />
+    <Resource Include="Assets\star-empty.png" />
+    <Resource Include="Assets\star-filled.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

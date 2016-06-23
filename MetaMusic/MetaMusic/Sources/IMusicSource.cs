@@ -10,6 +10,9 @@ namespace MetaMusic.Sources
 		TimeSpan Position
 		{ get; }
 
+		string Title
+		{ get; }
+
 		bool IsPlaying
 		{ get; }
 

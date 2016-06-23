@@ -1,0 +1,26 @@
+﻿TWG Retina Icons by The Working Group: https://www.iconfinder.com/iconsets/TWG_Retina_Icons
+- License: CC Attribution Share-Alike 3.0 Unported
+- Icons from this set:
+	- fedora.png
+	- minus.png
+	- next.png
+	- pause.png
+	- play.png
+	- previous.png
+	- repeat.png
+	- stop.png
+
+Small N Flat Icons by Paomedia: https://www.iconfinder.com/iconsets/small-n-flat
+- License: CC Attribution 3.0 Unported
+- Icons from this set:
+	- star-filled.png
+
+Developer Set Icons by Anastasya Bolshakova: https://www.iconfinder.com/iconsets/developer-set-3
+- License: Free for commercial use
+- Icons from this set:
+	- star-empty.png
+
+SoundCloud Logo Icons (required use): https://developers.soundcloud.com/docs/api/buttons-logos
+- Icons from this set:
+	- powered-by-soundcloud.png
+	- soundcloud-logo.png

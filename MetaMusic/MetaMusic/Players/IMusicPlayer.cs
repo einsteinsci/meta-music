@@ -8,13 +8,21 @@ using MetaMusic.Sources;
 
 namespace MetaMusic.Players
 {
-	public interface IMusicPlayer<T> 
+	public interface IMusicPlayer<T> : IMusicPlayer
 		where T : IMusicSource
 	{
-		T Source
+		new T Source
 		{ get; }
 
 		void Play(T source);
+	}
+
+	public interface IMusicPlayer
+	{
+		IMusicSource Source
+		{ get; }
+
+		void PlaySrc(IMusicSource source);
 
 		void Resume();
 

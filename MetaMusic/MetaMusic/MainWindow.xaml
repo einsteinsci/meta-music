@@ -1,12 +1,15 @@
-﻿<Window x:Class="MetaMusic.MainWindow"
+﻿<controls:MetroWindow x:Class="MetaMusic.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:m="clr-namespace:MahApps;assembly=MahApps.Metro"
         xmlns:local="clr-namespace:MetaMusic"
+        xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
         Title="Meta Music Player" Height="350" Width="525"
-        Icon="icon.ico">
+        Icon="icon.ico"
+        Closed="MainWindow_OnClosed">
   <Window.TaskbarItemInfo>
     <TaskbarItemInfo>
       <TaskbarItemInfo.ThumbButtonInfos>
@@ -26,23 +29,28 @@
     <StackPanel>
       <TextBox x:Name="MusicPathBox"
                Margin="5"
-               Text="C:\Users\sealedinterface\OneDrive\Music\Captain-Cool.mp3"/>
+               Text="https://soundcloud.com/mrnightron/fort-flask"/>
       <StackPanel Orientation="Horizontal"
                   HorizontalAlignment="Center">
         <Button x:Name="PlayBtn"
                 Content="Play"
                 Margin="5"
                 Width="72"
+                Style="{StaticResource AccentedSquareButtonStyle}"
                 Click="PlayBtn_OnClick" />
         <Button x:Name="StopBtn"
                 Content="Stop"
                 Margin="5"
                 Width="72"
+                Style="{StaticResource AccentedSquareButtonStyle}"
                 Click="StopBtn_OnClick"/>
       </StackPanel>
       <TextBlock x:Name="StatusTxt"
-                 Text="No file playing."
+                 Text="Enter a URL to play."
                  HorizontalAlignment="Center"/>
     </StackPanel>
   </Grid>
-</Window>
+</controls:MetroWindow>
+
+
+

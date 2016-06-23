@@ -14,23 +14,40 @@ namespace MetaMusic.Players
 		public T Source
 		{ get; protected set; }
 
-		public void Play(T source)
+		public float Volume
+		{ get; set; }
+
+		protected MusicPlayerBase()
+		{
+			Volume = 1.0f;
+		}
+
+		public virtual void Play(T source)
 		{
 			Source = source;
 			Resume();
 		}
 
-		public void Resume()
+		void IMusicPlayer.PlaySrc(IMusicSource src)
+		{
+			T t = src as T;
+			if (t != null)
+			{
+				Play(t);
+			}
+		}
+
+		public virtual void Resume()
 		{
 			Source.Play();
 		}
 
-		public void Pause()
+		public virtual void Pause()
 		{
 			Source.Pause();
 		}
 
-		public void TogglePause()
+		public virtual void TogglePause()
 		{
 			if (Source.IsPlaying)
 			{
@@ -42,10 +59,15 @@ namespace MetaMusic.Players
 			}
 		}
 
-		public void Stop()
+		public virtual void Stop()
 		{
-			Source.Stop();
-			Source = null;
+			if (Source != null)
+			{
+				Source.Stop();
+				Source = null;
+			}
 		}
+
+		IMusicSource IMusicPlayer.Source => Source;
 	}
 }

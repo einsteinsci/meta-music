@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,7 +14,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
+using MahApps.Metro.Controls;
+
 using MetaMusic.Players;
+using MetaMusic.Sources;
 
 using UltimateUtil;
 using IOPath = System.IO.Path;
@@ -27,48 +29,46 @@ namespace MetaMusic
 	/// </summary>
 	
 	// ReSharper disable once RedundantExtendsListEntry
-	public partial class MainWindow : Window
+	public partial class MainWindow : MetroWindow
 	{
-		public readonly MediaPlayer Player = new MediaPlayer();
+		public readonly MediaPlayer InternalFilePlayer = new MediaPlayer();
+		public readonly WebMusicHelper InternalWebPlayer = new WebMusicHelper();
 
-		public readonly DispatcherTimer Timer = new DispatcherTimer() {
+		public readonly DispatcherTimer Timer = new DispatcherTimer {
 			Interval = TimeSpan.FromSeconds(0.5)
 		};
 
-		public readonly FilePlayer FilePlayer;
+		public readonly VersatilePlayer Player;
 
-		private FlashWindowHelper _flashHelper;
+		private IMusicSource _currentTrack;
+
+		//private FlashWindowHelper _flashHelper = new FlashWindowHelper();
 
 		public MainWindow()
 		{
 			InitializeComponent();
 
-			FilePlayer = new FilePlayer(Player);
+			Player = new VersatilePlayer(InternalFilePlayer, InternalWebPlayer);
 
-			Timer.Tick += (s, e) => {
-				if (!File.Exists(MusicPathBox.Text) && FilePlayer.Source == null)
-				{
-					StatusTxt.Text = "File does not exist.";
-				}
-				else
-				{
-					StatusTxt.Text = FilePlayer.Source.GetDurationString();
-				}
-			};
+			Timer.Tick += (s, e) => { StatusTxt.Text = Player.StatusText; };
 
 			Timer.Start();
+
+			Player.TitleChanged += (s, e) => { UpdateTitleBar(); };
 		}
 
 		public void UpdateTitleBar()
 		{
-			if (FilePlayer.Source != null)
-			{
-				Title = "MM | " + IOPath.GetFileName(FilePlayer.Source.FilePath);
-			}
-			else
-			{
-				Title = "Meta Music Player";
-			}
+			Dispatcher.Invoke(() => {
+				if (Player.Source != null)
+				{
+					Title = "MM | " + IOPath.GetFileName(Player.Source.Title);
+				}
+				else
+				{
+					Title = "Meta Music Player";
+				}
+			});
 		}
 
 		public void UpdatePlayBtn(string desc)
@@ -88,26 +88,33 @@ namespace MetaMusic
 
 		private void PlayBtn_OnClick(object sender, RoutedEventArgs e)
 		{
-			if (FilePlayer.Source == null)
+			if (Player.Source == null)
 			{
-				if (File.Exists(MusicPathBox.Text))
+				if (MusicPathBox.Text.StartsWith("http"))
 				{
-					FilePlayer.Play(MusicPathBox.Text);
-					UpdateTitleBar();
-					UpdatePlayBtn("Pause");
+					_currentTrack = new SoundCloudMusic(MusicPathBox.Text, InternalWebPlayer);
 				}
+				else
+				{
+					_currentTrack = new FileMusic(MusicPathBox.Text, InternalFilePlayer);
+				}
+
+				Player.Play(_currentTrack);
+				UpdatePlayBtn("Pause");
 			}
 			else
 			{
-				FilePlayer.TogglePause();
-				UpdatePlayBtn(FilePlayer.Source.IsPlaying ? "Pause" : "Resume");
+				Player.TogglePause();
+				UpdatePlayBtn(Player.Source.IsPlaying ? "Pause" : "Resume");
 			}
-
 		}
 
 		private void StopBtn_OnClick(object sender, RoutedEventArgs e)
 		{
-			FilePlayer.Stop();
+			//_scStop = true;
+			//InternalWebPlayer.Stop();
+
+			Player.Stop();
 			UpdateTitleBar();
 			UpdatePlayBtn("Play");
 		}
@@ -120,6 +127,16 @@ namespace MetaMusic
 		private void StopThumbBtn_OnClick(object sender, EventArgs e)
 		{
 			StopBtn_OnClick(sender, null);
+		}
+
+		private void MainWindow_OnClosed(object sender, EventArgs e)
+		{
+			//if (StreamPlayer != null && StreamPlayer.IsBusy)
+			//{
+			//	StreamPlayer.CancelAsync();
+			//}
+
+			InternalWebPlayer.Stop();
 		}
 	}
 }
