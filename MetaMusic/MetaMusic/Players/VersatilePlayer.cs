@@ -9,12 +9,15 @@ using MetaMusic.Sources;
 
 namespace MetaMusic.Players
 {
-	public class VersatilePlayer : IMusicPlayer<IMusicSource>
+	public class VersatilePlayer : IMusicPlayer<IMusicSource>, ILoadingText
 	{
 		public FilePlayer StandardFilePlayer
 		{ get; private set; }
 
 		public SoundCloudPlayer SoundCloudPlayer
+		{ get; private set; }
+
+		public BrstmPlayer BrstmPlayer
 		{ get; private set; }
 
 		public IMusicPlayer ActivePlayer
@@ -25,7 +28,7 @@ namespace MetaMusic.Players
 
 		public event EventHandler TitleChanged;
 
-		public string StatusText
+		public string LoadingText
 		{
 			get
 			{
@@ -34,34 +37,41 @@ namespace MetaMusic.Players
 					return "Enter a URL to play.";
 				}
 
-				if (ActivePlayer is SoundCloudPlayer && SoundCloudPlayer.LoadingText != null)
+				ILoadingText ilt = ActivePlayer as ILoadingText;
+				if (ilt?.LoadingText != null)
 				{
-					return SoundCloudPlayer.LoadingText;
+					return ilt.LoadingText;
 				}
 
 				return Source.GetDurationString();
 			}
 		}
 
-		public VersatilePlayer(MediaPlayer mediaPlayer, WebMusicHelper webHelper)
+		public VersatilePlayer(MediaPlayer mediaPlayer, WebMusicHelper webHelper, WavSoundHelper wavHelper)
 		{
 			StandardFilePlayer = new FilePlayer(mediaPlayer);
 			SoundCloudPlayer = new SoundCloudPlayer(webHelper);
+			BrstmPlayer = new BrstmPlayer(wavHelper);
 		}
 
 		protected IMusicPlayer getMatchingPlayer(Type sourceType)
 		{
+			IMusicPlayer res = null;
+
 			if (sourceType == typeof(FileMusic))
 			{
-				return StandardFilePlayer;
+				res = StandardFilePlayer;
 			}
-
-			if (sourceType == typeof(SoundCloudMusic))
+			else if (sourceType == typeof(SoundCloudMusic))
 			{
-				return SoundCloudPlayer;
+				res = SoundCloudPlayer;
+			}
+			else if (sourceType == typeof(BrstmMusic))
+			{
+				res = BrstmPlayer;
 			}
 
-			return null;
+			return res;
 		}
 
 		public void Play(IMusicSource source)
@@ -73,11 +83,11 @@ namespace MetaMusic.Players
 				ActivePlayer = getMatchingPlayer(Source.GetType());
 				ActivePlayer.PlaySrc(Source);
 
-				if (ActivePlayer == SoundCloudPlayer)
+				if (ActivePlayer is SoundCloudPlayer)
 				{
 					SoundCloudPlayer.Source.TitleChanged += (s, e) => { TitleChanged?.Invoke(s, e); };
 				}
-				else if (ActivePlayer == StandardFilePlayer)
+				else // if (ActivePlayer is FilePlayer)
 				{
 					TitleChanged?.Invoke(this, new EventArgs());
 				}

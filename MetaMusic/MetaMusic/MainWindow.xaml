@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:MetaMusic"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
-        Title="Meta Music Player" Height="350" Width="525"
+        Title="Meta Music Player" Height="200" Width="800"
         Icon="icon.ico"
         Closed="MainWindow_OnClosed">
   <Window.TaskbarItemInfo>
@@ -29,7 +29,7 @@
     <StackPanel>
       <TextBox x:Name="MusicPathBox"
                Margin="5"
-               Text="https://soundcloud.com/mrnightron/fort-flask"/>
+               Text="C:\Users\sealedinterface\OneDrive\Projects\Smash Bros\Minus BFB Music\[FD] Devil May Sly (God Hand).brstm"/>
       <StackPanel Orientation="Horizontal"
                   HorizontalAlignment="Center">
         <Button x:Name="PlayBtn"
@@ -48,6 +48,20 @@
       <TextBlock x:Name="StatusTxt"
                  Text="Enter a URL to play."
                  HorizontalAlignment="Center"/>
+      <Button Content="Do vgmstream stuff"
+              Margin="5"
+              Width="150"
+              Style="{StaticResource AccentedSquareButtonStyle}"
+              Visibility="Collapsed"
+              Click="DoInCubeStuffBtn_OnClick"/>
+      <Image Source="Assets/powered-by-soundcloud.png"
+             HorizontalAlignment="Center"
+             Width="104"
+             Height="32"
+             SnapsToDevicePixels="True"
+             Stretch="Fill"
+             UseLayoutRounding="True"
+             Margin="0,30,0,0" />
     </StackPanel>
   </Grid>
 </controls:MetroWindow>

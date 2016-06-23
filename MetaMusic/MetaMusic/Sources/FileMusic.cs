@@ -43,8 +43,6 @@ namespace MetaMusic.Sources
 			_player = player;
 			_player.Open(new Uri(FilePath));
 		}
-		internal FileMusic()
-		{ }
 
 		public void Open(string path = null)
 		{
@@ -61,11 +59,6 @@ namespace MetaMusic.Sources
 
 		public void Play()
 		{
-			if (FilePath == null)
-			{
-				throw new InvalidOperationException("FilePath is null.");
-			}
-
 			if (_player.Source == null)
 			{
 				throw new InvalidOperationException("MediaPlayer.Source is null.");

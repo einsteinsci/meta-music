@@ -14,7 +14,7 @@ using UltimateUtil;
 
 namespace MetaMusic.Sources
 {
-	public class SoundCloudMusic : IMusicSource, ILastException
+	public sealed class SoundCloudMusic : IMusicSource, ILastException
 	{
 		public WebMusicHelper WebHelper
 		{ get; private set; }
@@ -23,16 +23,16 @@ namespace MetaMusic.Sources
 		{ get; private set; }
 
 		public string StreamURL
-		{ get; set; }
+		{ get; private set; }
 
 		public string TemporaryFileURL
-		{ get; set; }
+		{ get; private set; }
 
 		public TimeSpan? Duration
-		{ get; set; }
+		{ get; private set; }
 
 		public string Title
-		{ get; set; }
+		{ get; private set; }
 
 		public TimeSpan Position => WebHelper.Progress;
 
@@ -40,7 +40,7 @@ namespace MetaMusic.Sources
 		{ get; private set; }
 
 		public bool HasLoaded
-		{ get; set; }
+		{ get; private set; }
 
 		public Exception LastException
 		{ get; private set; }

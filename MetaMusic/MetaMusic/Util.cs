@@ -9,6 +9,8 @@ using System.Windows.Media.Imaging;
 using MetaMusic.Players;
 using MetaMusic.Sources;
 
+using NAudio.Wave;
+
 using UltimateUtil;
 
 namespace MetaMusic
@@ -33,6 +35,17 @@ namespace MetaMusic
 		public static string GetResolveUrl(string permanentUrl)
 		{
 			return "https://api.soundcloud.com/resolve?url=" + permanentUrl + "&client_id=" + SoundCloudPlayer.__CLIENTID__;
+		}
+
+		public static string Quote(this string str)
+		{
+			return "\"" + str + "\"";
+		}
+
+		public static TimeSpan GetWavDuration(string filePath)
+		{
+			WaveFileReader reader = new WaveFileReader(filePath);
+			return reader.TotalTime;
 		}
 	}
 }

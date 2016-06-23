@@ -39,6 +39,9 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BrawlLib">
+      <HintPath>..\..\..\..\..\Documents\Soft Install\BrawlBox\BrawlLib.dll</HintPath>
+    </Reference>
     <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.2.4.0\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
@@ -54,10 +57,6 @@
     <Reference Include="Ookii.Dialogs.Wpf, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0c15020868fd6249, processorArchitecture=MSIL">
       <HintPath>..\packages\Ookii.Dialogs.1.0\lib\net35\Ookii.Dialogs.Wpf.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="SoundCloud.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Lib\SoundCloud.Api.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -87,14 +86,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BrstmConvert\VgmstreamConverter.cs" />
+    <Compile Include="BrstmConvert\VgmstreamProcess.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="FlashWindowHelper.cs" />
     <Compile Include="ILastException.cs" />
+    <Compile Include="ILoadingText.cs" />
     <Compile Include="MetaMusicLogic.cs" />
+    <Compile Include="Players\BrstmPlayer.cs" />
     <Compile Include="Players\SoundCloudPlayer.cs" />
     <Compile Include="Players\VersatilePlayer.cs" />
-    <Compile Include="PlayListItem.cs" />
+    <Compile Include="Playlist.cs" />
+    <Compile Include="PlaylistItem.cs" />
+    <Compile Include="Sources\BrstmMusic.cs" />
     <Compile Include="Sources\SoundCloudMusic.cs" />
     <Compile Include="Util.cs" />
+    <Compile Include="WavSoundHelper.cs" />
     <Compile Include="WebMusicHelper.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -138,6 +146,12 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="vgmstream\COPYING">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="vgmstream\g7221-siren7_14_G719_license_agreement.doc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -169,6 +183,38 @@
     <Resource Include="Assets\soundcloud-logo.png" />
     <Resource Include="Assets\star-empty.png" />
     <Resource Include="Assets\star-filled.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="vgmstream\g7221-gen-lic.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Content Include="vgmstream\in_vgmstream.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="vgmstream\libg7221_decode.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="vgmstream\libmpg123-0.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="vgmstream\libogg-1.1.3.COPYING.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="vgmstream\libvorbis-1.2.0.COPYING.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Content Include="vgmstream\libvorbis.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="vgmstream\mpg123-1.4.3.COPYING.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="vgmstream\readme.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Content Include="vgmstream\test.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

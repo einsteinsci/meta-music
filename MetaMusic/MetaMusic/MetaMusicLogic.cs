@@ -19,8 +19,9 @@ namespace MetaMusic
 
 		public Dispatcher Dispatcher => Window.Dispatcher;
 
-		public readonly MediaPlayer InternalFilePlayer = new MediaPlayer();
-		public readonly WebMusicHelper InternalWebPlayer = new WebMusicHelper();
+		public readonly MediaPlayer FileMediaPlayer = new MediaPlayer();
+		public readonly WebMusicHelper WebHelper = new WebMusicHelper();
+		public readonly WavSoundHelper WavHelper = new WavSoundHelper();
 
 		public readonly DispatcherTimer Timer = new DispatcherTimer
 		{
@@ -35,9 +36,9 @@ namespace MetaMusic
 		{
 			Window = window;
 
-			Player = new VersatilePlayer(InternalFilePlayer, InternalWebPlayer);
+			Player = new VersatilePlayer(FileMediaPlayer, WebHelper, WavHelper);
 
-			Timer.Tick += (s, e) => { Window.StatusTxt.Text = Player.StatusText; };
+			Timer.Tick += (s, e) => { Window.StatusTxt.Text = Player.LoadingText; };
 
 			Timer.Start();
 
@@ -77,13 +78,19 @@ namespace MetaMusic
 		{
 			if (Player.Source == null)
 			{
-				if (Window.MusicPathBox.Text.StartsWith("http"))
+				string url = Window.MusicPathBox.Text;
+
+				if (url.StartsWith("https://soundcloud.com") || url.StartsWith("http://soundcloud.com"))
 				{
-					_currentTrack = new SoundCloudMusic(Window.MusicPathBox.Text, InternalWebPlayer);
+					_currentTrack = new SoundCloudMusic(url, WebHelper);
 				}
-				else
+				else if (url.EndsWith(".mp3"))
 				{
-					_currentTrack = new FileMusic(Window.MusicPathBox.Text, InternalFilePlayer);
+					_currentTrack = new FileMusic(url, FileMediaPlayer);
+				}
+				else if (url.EndsWith(".brstm"))
+				{
+					_currentTrack = new BrstmMusic(url, WavHelper);
 				}
 
 				Player.Play(_currentTrack);
@@ -108,7 +115,8 @@ namespace MetaMusic
 			Stop();
 
 			Timer.Stop();
-			InternalWebPlayer.Stop();
+			WebHelper.Stop();
+			WavHelper.Stop();
 		}
 	}
 }

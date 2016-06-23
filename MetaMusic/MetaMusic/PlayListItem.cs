@@ -11,14 +11,13 @@ using Newtonsoft.Json;
 namespace MetaMusic
 {
 	[JsonObject(MemberSerialization.OptIn)]
-	public sealed class PlayListItem
+	public sealed class PlaylistItem
 	{
 		public enum PlayListItemType
 		{
 			File,
 			BRSTM,
-			SoundCloud,
-			YouTube
+			SoundCloud
 		}
 
 		public IMusicSource SoundSource
@@ -36,13 +35,19 @@ namespace MetaMusic
 		public PlayListItemType Type
 		{ get; set; }
 
+		[JsonProperty]
+		public TimeSpan Duration
+		{ get; set; }
+
 		// For local types, this means the file path. For web types, this means the URL.
 		public string Location
 		{ get; set; }
 
-		public PlayListItem(IMusicSource source, string name)
+		public PlaylistItem(IMusicSource source, string name)
 		{
 			
 		}
+		internal PlaylistItem()
+		{ }
 	}
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -13,12 +12,15 @@ using NAudio.Wave;
 
 namespace MetaMusic
 {
-	public class WebMusicHelper : ILastException
+	public class WavSoundHelper : ILastException
 	{
 		public TimeSpan Progress
 		{ get; private set; }
 
-		public string URL
+		public TimeSpan? Duration
+		{ get; private set; }
+
+		public string FilePath
 		{ get; private set; }
 
 		public bool IsLoaded
@@ -55,23 +57,24 @@ namespace MetaMusic
 
 		private Action _onPlayStart;
 
-		public WebMusicHelper()
+		public WavSoundHelper()
 		{
 			CurrentVolume = 1.0f;
 		}
 
-		public void LoadFromUrl(string url)
+		public void LoadFromPath(string path)
 		{
-			URL = url;
+			FilePath = path;
 
-			_worker = new BackgroundWorker {
+			_worker = new BackgroundWorker
+			{
 				WorkerReportsProgress = true,
 				WorkerSupportsCancellation = true
 			};
 
 			_worker.DoWork += (s, e) => { _worker_DoWork(); };
 			_worker.ProgressChanged += (s, e) => { Progress = (TimeSpan)e.UserState; };
-			
+
 			IsLoaded = true;
 			HasThrown = false;
 			_stopped = false;
@@ -108,7 +111,7 @@ namespace MetaMusic
 			_worker?.CancelAsync();
 
 			_worker = null;
-			URL = null;
+			FilePath = null;
 			IsLoaded = false;
 
 			IsPaused = false;
@@ -120,49 +123,27 @@ namespace MetaMusic
 			{
 				return;
 			}
-
-			try
+			
+			_onPlayStart();
+			
+			using (WaveFileReader reader = new WaveFileReader(FilePath))
 			{
-				using (Stream ms = new MemoryStream())
+				Duration = reader.TotalTime;
+
+				using (WaveOut waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
 				{
-					_fillMemoryStream(ms);
-
-					_onPlayStart();
-
-					ms.Position = 0;
-					using (WaveStream blockAlignedStream = new BlockAlignReductionStream(
-							WaveFormatConversionStream.CreatePcmStream(new Mp3FileReader(ms))))
-					{
-						using (WaveOut waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
-						{
-							_playSoundStream(waveOut, blockAlignedStream);
-						}
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				Stop();
-				HasThrown = true;
-				LastException = ex;
-			}
-		}
-
-		private void _fillMemoryStream(Stream ms)
-		{
-			using (Stream stream = WebRequest.Create(URL).GetResponse().GetResponseStream())
-			{
-				byte[] buffer = new byte[short.MaxValue + 1];
-				int read;
-				while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
-				{
-					ms.Write(buffer, 0, read);
+					_playSoundStream(waveOut, reader);
 				}
 			}
 		}
 
 		private void _playSoundStream(WaveOut waveOut, WaveStream blockAlignedStream)
 		{
+			if (blockAlignedStream == null)
+			{
+				throw new ArgumentNullException(nameof(blockAlignedStream));
+			}
+
 			Stopwatch timer = new Stopwatch();
 			timer.Start();
 
@@ -187,7 +168,7 @@ namespace MetaMusic
 				{
 					waveOut.Stop();
 				}
-				
+
 				_worker?.ReportProgress(0, timer.Elapsed);
 
 				Thread.Sleep(100);

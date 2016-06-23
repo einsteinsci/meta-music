@@ -8,7 +8,7 @@ using MetaMusic.Sources;
 
 namespace MetaMusic.Players
 {
-	public class SoundCloudPlayer : MusicPlayerBase<SoundCloudMusic>, ILastException
+	public class SoundCloudPlayer : MusicPlayerBase<SoundCloudMusic>, ILastException, ILoadingText
 	{
 		internal const string __CLIENTID__ = "32c6d127f78f111e92213bd0ba364199";
 		private const string __SECRET__ = "7b23cc35985b69a911ad865c86bdc58a";

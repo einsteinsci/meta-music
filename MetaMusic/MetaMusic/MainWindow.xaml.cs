@@ -15,6 +15,8 @@ using System.Windows.Shapes;
 
 using MahApps.Metro.Controls;
 
+using MetaMusic.BrstmConvert;
+
 namespace MetaMusic
 {
 	/// <summary>
@@ -38,6 +40,11 @@ namespace MetaMusic
 
 		private void PlayBtn_OnClick(object sender, RoutedEventArgs e)
 		{
+			if (!Logic.Timer.IsEnabled)
+			{
+				Logic.Timer.Start();
+			}
+
 			Logic.TogglePlay();
 		}
 
@@ -59,6 +66,13 @@ namespace MetaMusic
 		private void MainWindow_OnClosed(object sender, EventArgs e)
 		{
 			Logic.ShutDown();
+		}
+
+		private void DoInCubeStuffBtn_OnClick(object sender, RoutedEventArgs e)
+		{
+			string outputPath = VgmstreamConverter.ConvertToWAV("victim.brstm");
+			StatusTxt.Text = outputPath;
+			Logic.Timer.Stop();
 		}
 	}
 }
