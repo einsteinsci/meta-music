@@ -89,6 +89,7 @@
     </ApplicationDefinition>
     <Compile Include="FlashWindowHelper.cs" />
     <Compile Include="ILastException.cs" />
+    <Compile Include="MetaMusicLogic.cs" />
     <Compile Include="Players\SoundCloudPlayer.cs" />
     <Compile Include="Players\VersatilePlayer.cs" />
     <Compile Include="PlayListItem.cs" />
