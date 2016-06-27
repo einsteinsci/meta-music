@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -38,7 +39,9 @@ namespace MetaMusic
 
 			Player = new VersatilePlayer(FileMediaPlayer, WebHelper, WavHelper);
 
-			Timer.Tick += (s, e) => { Window.StatusTxt.Text = Player.LoadingText; };
+			Timer.Tick += (s, e) => {
+				//Window.StatusTxt.Text = Player.LoadingText;
+			};
 
 			Timer.Start();
 
@@ -61,10 +64,12 @@ namespace MetaMusic
 
 		public void UpdatePlayBtn(string desc)
 		{
-			Window.PlayBtn.Content = desc;
+			//Window.PlayBtn.Content = desc;
 			Window.PlayThumbBtn.Description = desc;
+			Window.Min_PlayBtn.ToolTip = desc;
 
-			if (desc == "Play" || desc == "Resume")
+			bool isPlay = (desc == "Play" || desc == "Resume");
+			if (isPlay)
 			{
 				Window.PlayThumbBtn.ImageSource = Util.LoadImage("Assets/play.png");
 			}
@@ -72,13 +77,26 @@ namespace MetaMusic
 			{
 				Window.PlayThumbBtn.ImageSource = Util.LoadImage("Assets/pause.png");
 			}
+
+			if (isPlay)
+			{
+				Window.Min_PlayBtn.Content = MainWindow.PLAY;
+				Window.Min_PlayBtn.FontSize = 16;
+				Window.Min_PlayBtn.Margin = new Thickness { Bottom = 3, Left = 5, Right = 5 };
+			}
+			else
+			{
+				Window.Min_PlayBtn.Content = MainWindow.PAUSE;
+				Window.Min_PlayBtn.FontSize = 20;
+				Window.Min_PlayBtn.Margin = new Thickness { Bottom = 5, Left = 2, Right = 1.5 };
+			}
 		}
 
 		public void TogglePlay()
 		{
 			if (Player.Source == null)
 			{
-				string url = Window.MusicPathBox.Text;
+				string url = "";//Window.MusicPathBox.Text;
 
 				if (url.StartsWith("https://soundcloud.com") || url.StartsWith("http://soundcloud.com"))
 				{
