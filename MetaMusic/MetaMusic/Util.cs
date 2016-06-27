@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -17,6 +19,17 @@ namespace MetaMusic
 {
 	public static class Util
 	{
+		[StructLayout(LayoutKind.Sequential)]
+		internal struct Win32Point
+		{
+			public int X;
+			public int Y;
+		};
+
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		internal static extern bool GetCursorPos(ref Win32Point pt);
+
 		public static string GetDurationString(this IMusicSource source)
 		{
 			if (source == null)
@@ -46,6 +59,18 @@ namespace MetaMusic
 		{
 			WaveFileReader reader = new WaveFileReader(filePath);
 			return reader.TotalTime;
+		}
+
+		public static Point GetMousePosition()
+		{
+			Win32Point w32Mouse = new Win32Point();
+			GetCursorPos(ref w32Mouse);
+			return new Point(w32Mouse.X, w32Mouse.Y);
+		}
+
+		public static Visibility ToVis(this bool b, Visibility onFalse = Visibility.Collapsed)
+		{
+			return b ? Visibility.Visible : onFalse;
 		}
 	}
 }

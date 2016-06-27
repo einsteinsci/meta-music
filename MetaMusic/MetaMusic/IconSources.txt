@@ -8,6 +8,8 @@
 	- play.png
 	- previous.png
 	- repeat.png
+	- sound.png
+	- sound-minus.png
 	- stop.png
 
 Small N Flat Icons by Paomedia: https://www.iconfinder.com/iconsets/small-n-flat
