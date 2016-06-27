@@ -188,8 +188,6 @@
     <Resource Include="vgmstream\g7221-gen-lic.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\sound.png" />
-    <Resource Include="Assets\sound-minus.png" />
     <Content Include="vgmstream\in_vgmstream.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
