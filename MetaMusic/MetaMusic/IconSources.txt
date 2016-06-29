@@ -12,15 +12,19 @@
 	- sound-minus.png
 	- stop.png
 
-Small N Flat Icons by Paomedia: https://www.iconfinder.com/iconsets/small-n-flat
-- License: CC Attribution 3.0 Unported
+Tango Icons by Various: https://www.iconfinder.com/iconsets/tango
+- License: Public Domain
 - Icons from this set:
-	- star-filled.png
+	- tb-next.png
+	- tb-pause.png
+	- tb-play.png
+	- tb-previous.png
+	- tb-stop.png
 
-Developer Set Icons by Anastasya Bolshakova: https://www.iconfinder.com/iconsets/developer-set-3
-- License: Free for commercial use
+Rounded Music Icons by SALEM MBARKI: https://www.iconfinder.com/iconsets/rounded-music-pack
+- CC Attribution 3.0 Unported
 - Icons from this set:
-	- star-empty.png
+	- icon.ico
 
 SoundCloud Logo Icons (required use): https://developers.soundcloud.com/docs/api/buttons-logos
 - Icons from this set:

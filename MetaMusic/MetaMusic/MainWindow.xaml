@@ -7,9 +7,9 @@
                xmlns:local="clr-namespace:MetaMusic"
                xmlns:m="http://metro.mahapps.com/winfx/xaml/controls"
                mc:Ignorable="d"
-               Height="200"
-               Width="800"
-               MinWidth="222"
+               Height="560"
+               Width="1000"
+               MinWidth="710"
                Title="Captain-Cool.mp3"
                Closed="MainWindow_OnClosed"
                Loaded="MainWindow_OnLoaded"
@@ -17,15 +17,16 @@
                TitlebarHeight="39"
                BorderBrush="{DynamicResource AccentColorBrush}"
                BorderThickness="1"
-               Topmost="True"
-               IsMaxRestoreButtonEnabled="False">
+               Background="#232323"
+               Foreground="White"
+               ShowIconOnTitleBar="False"
+               NonActiveBorderBrush="{DynamicResource AccentColorBrush}"
+               NonActiveWindowTitleBrush="{Binding WindowTitleBrush, ElementName=MainMetroWindow}">
   <Window.Icon>
     <BitmapImage UriSource="icon.ico" />
   </Window.Icon>
   <Window.Resources>
     <ResourceDictionary>
-      <SolidColorBrush x:Key="SoundCloudBrush"
-                       Color="#FFFF7400" />
     </ResourceDictionary>
   </Window.Resources>
 
@@ -33,23 +34,29 @@
     <TaskbarItemInfo>
       <TaskbarItemInfo.ThumbButtonInfos>
         <ThumbButtonInfo Description="Previous Track"
-                         ImageSource="Assets/previous.png"
+                         ImageSource="Assets/tb-previous.png"
                          Click="PrevThumbBtn_OnClick" />
         <ThumbButtonInfo x:Name="PlayThumbBtn"
                          Description="Play"
-                         ImageSource="Assets/play.png"
+                         ImageSource="Assets/tb-play.png"
                          Click="PlayThumbBtn_OnClick" />
         <ThumbButtonInfo Description="Stop"
-                         ImageSource="Assets/stop.png"
+                         ImageSource="Assets/tb-stop.png"
                          Click="StopThumbBtn_OnClick" />
         <ThumbButtonInfo Description="Next Track"
-                         ImageSource="Assets/next.png"
+                         ImageSource="Assets/tb-next.png"
                          Click="NextThumbBtn_OnClick" />
+        <ThumbButtonInfo Description="Toggle Minimalist Mode"
+                         ImageSource="Assets/tb-minimalist.png"
+                         Click="MinThumbBtn_OnClick" />
       </TaskbarItemInfo.ThumbButtonInfos>
     </TaskbarItemInfo>
   </Window.TaskbarItemInfo>
+
   <m:MetroWindow.RightWindowCommands>
     <m:WindowCommands Margin="0,0,0,2">
+      <Separator x:Name="Min_ProgressSeparator"
+                 Visibility="Collapsed" />
       <Slider x:Name="Min_ProgressSlider"
               SnapsToDevicePixels="True"
               Visibility="Collapsed"
@@ -58,6 +65,7 @@
               LargeChange="0.1"
               SmallChange="0.05"
               ToolTip="{Binding ElementName=MainMetroWindow, Path=Title}"
+              Style="{DynamicResource SliderTitleBarSmallThumb}"
               VerticalAlignment="Center"
               Margin="0,2"
               Value="0.3"
@@ -71,39 +79,128 @@
               Click="MinimalistBtn_OnClick" />
     </m:WindowCommands>
   </m:MetroWindow.RightWindowCommands>
+
   <m:MetroWindow.LeftWindowCommands>
     <m:WindowCommands>
-      <TextBlock x:Name="MMTxt" 
-                 Text="MM" 
-                 FontSize="16"
-                 ToolTip="Meta Music Player" />
+      <Button x:Name="TitleBtn"
+              Content="MM"
+              FontSize="16"
+              ToolTip="Meta Music Player"
+              Click="TitleBtn_OnClick">
+        <Button.ContextMenu>
+          <ContextMenu x:Name="MainContextMenu"
+                       MinWidth="128">
+            <MenuItem Header="File">
+              <MenuItem Header="Open..." />
+            </MenuItem>
+            <MenuItem Header="View">
+              <MenuItem x:Name="MinimalistMenuItem"
+                        Header="Minimalist Mode"
+                        IsCheckable="True"
+                        Click="MinimalistBtn_OnClick" />
+              <MenuItem x:Name="ThemeMenuRoot"
+                        Header="Window Style">
+                <MenuItem Header="Red"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Green"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Blue"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Purple"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Orange"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Lime"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Emerald"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Teal"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Cyan"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Cobalt"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Indigo"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Violet"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Pink"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Magenta"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Crimson"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Amber"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Yellow"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Brown"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Olive"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Steel"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Mauve"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Taupe"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+                <MenuItem Header="Sienna"
+                          IsCheckable="True"
+                          Click="AccentColorMenu_OnClick" />
+              </MenuItem>
+            </MenuItem>
+          </ContextMenu>
+        </Button.ContextMenu>
+      </Button>
       <StackPanel x:Name="Min_FlowControlPanel"
                   Visibility="Collapsed"
                   VerticalAlignment="Center"
                   Orientation="Horizontal">
         <Button x:Name="Min_PrevTrackBtn"
-                Click="Min_PrevTrackBtn_OnClick"
+                Click="PrevTrackBtn_OnClick"
                 FontSize="24"
                 FontWeight="Bold"
                 Content="&#x00ab;"
                 Margin="0,-2,0,10"
                 ToolTip="Previous Track" />
         <Button x:Name="Min_PlayBtn"
-                Click="Min_PlayBtn_OnClick"
+                Click="PlayBtn_OnClick"
                 FontSize="20"
                 FontWeight="Bold"
                 Content="&#x25b6;"
                 Margin="0,0,0,5"
                 ToolTip="Play" />
         <Button x:Name="Min_StopBtn"
-                Click="Min_StopBtn_OnClick"
+                Click="StopBtn_OnClick"
                 FontSize="18"
                 FontWeight="Bold"
                 Content="&#x25a0;"
                 Margin="0,0,0,1"
                 ToolTip="Stop" />
         <Button x:Name="Min_NextTrackBtn"
-                Click="Min_NextTrackBtn_OnClick"
+                Click="NextTrackBtn_OnClick"
                 FontSize="24"
                 FontWeight="Bold"
                 Content="&#x00bb;"
@@ -119,7 +216,7 @@
         </Grid.ColumnDefinitions>
 
         <Button x:Name="Min_VolumeBtn"
-                Click="Min_VolumeBtn_OnClick"
+                Click="VolumeBtn_OnClick"
                 Content="&#x1f508;"
                 FontSize="22"
                 Margin="2,0,16,3"
@@ -133,18 +230,348 @@
                 SmallChange="0.05"
                 ToolTip="Volume"
                 VerticalAlignment="Center"
+                Style="{DynamicResource SliderTitleBarSmallThumb}"
                 Margin="0,2"
                 Value="1"
-                IsMoveToPointEnabled="True" />
+                IsMoveToPointEnabled="True"
+                ValueChanged="VolumeSlider_OnValueChanged" />
       </Grid>
     </m:WindowCommands>
   </m:MetroWindow.LeftWindowCommands>
 
   <Grid x:Name="MainGrid">
-    <TextBlock x:Name="DebugTxt"
-               Text="DEBUG INFO"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center" />
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <Grid Grid.Row="0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <Image x:Name="SongCoverImg"
+             Grid.Column="0"
+             Stretch="Fill"
+             Margin="10"
+             Width="96"
+             Height="96" />
+
+      <Grid Grid.Column="1">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+
+          <TextBlock x:Name="TimeTxt"
+                     Grid.Column="0"
+                     VerticalAlignment="Center"
+                     Text="1:03 / 3:13"
+                     FontSize="22"
+                     Margin="5,0,0,0" />
+          <TextBlock x:Name="SongNameTxt"
+                     Grid.Column="1"
+                     VerticalAlignment="Center"
+                     Text="Captain-Cool.mp3"
+                     FontSize="16"
+                     Padding="0"
+                     Margin="10,0,0,0" />
+          <Button x:Name="SoundCloudLogoBtn"
+                  Grid.Column="3"
+                  VerticalAlignment="Center"
+                  HorizontalAlignment="Right"
+                  Margin="0,0,10,0"
+                  Padding="0"
+                  Opacity="0.7"
+                  Width="104"
+                  Height="32"
+                  Style="{DynamicResource ButtonContentOnly}"
+                  MouseEnter="SoundCloudLogoBtn_OnMouseEnter"
+                  MouseLeave="SoundCloudLogoBtn_OnMouseLeave"
+                  Click="SoundCloudLogoBtn_OnClick">
+            <Image Source="Assets/powered-by-soundcloud.png"
+                   Stretch="Fill"
+                   SnapsToDevicePixels="True" />
+          </Button>
+        </Grid>
+
+        <Grid Grid.Row="1"
+              Margin="5,5,10,5">
+          <Slider x:Name="ProgressSlider"
+                  Maximum="1"
+                  SmallChange="0.01"
+                  LargeChange="0.1"
+                  Style="{DynamicResource WideThumbSlider}"
+                  Value="0.31"
+                  Height="19" />
+        </Grid>
+
+        <Grid Grid.Row="2">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+
+          <StackPanel x:Name="__TrackControls"
+                      Orientation="Horizontal"
+                      VerticalAlignment="Center"
+                      Grid.Column="0"
+                      Margin="5,0,10,0">
+            <Button x:Name="PrevTrackBtn"
+                    Click="PrevTrackBtn_OnClick"
+                    Style="{DynamicResource MetroCircleButtonStyle}"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    Content="&#x00ab;"
+                    Padding="0,0,0,5"
+                    Width="32"
+                    Height="32"
+                    ToolTip="Previous Track"
+                    FontFamily="Segoe WP" />
+            <Button x:Name="PlayBtn"
+                    Click="PlayBtn_OnClick"
+                    Style="{DynamicResource MetroCircleButtonStyle}"
+                    FontWeight="Bold"
+                    Content="▶"
+                    Padding="1,0,0,2"
+                    Width="32"
+                    Height="32"
+                    ToolTip="Play" />
+            <Button x:Name="StopBtn"
+                    Click="StopBtn_OnClick"
+                    Style="{DynamicResource MetroCircleButtonStyle}"
+                    FontSize="12"
+                    FontWeight="Bold"
+                    Content="&#x25a0;"
+                    Padding="0,0,0,2"
+                    Width="32"
+                    Height="32"
+                    ToolTip="Stop" />
+            <Button x:Name="NextTrackBtn"
+                    Click="NextTrackBtn_OnClick"
+                    Style="{DynamicResource MetroCircleButtonStyle}"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    Content="&#x00bb;"
+                    Padding="0,0,0,5"
+                    Width="32"
+                    Height="32"
+                    ToolTip="Next Track"
+                    Margin="0"
+                    FontFamily="Segoe WP" />
+          </StackPanel>
+
+          <StackPanel x:Name="__RatingStars"
+                      Grid.Column="1"
+                      VerticalAlignment="Center"
+                      Orientation="Horizontal"
+                      Margin="10,0,0,0">
+            <Button x:Name="Rating1Btn"
+                    Content="&#x2606;"
+                    FontSize="24"
+                    Style="{DynamicResource ButtonContentOnly}"
+                    FontWeight="Normal"
+                    ToolTip="Rating"
+                    MouseEnter="Rating1Btn_OnMouseEnter"
+                    MouseLeave="RatingBtns_OnMouseLeave"
+                    Click="Rating1Btn_OnClick" />
+            <Button x:Name="Rating2Btn"
+                    Content="&#x2606;"
+                    FontSize="24"
+                    Style="{DynamicResource ButtonContentOnly}"
+                    FontWeight="Normal"
+                    ToolTip="Rating"
+                    MouseEnter="Rating2Btn_OnMouseEnter"
+                    MouseLeave="RatingBtns_OnMouseLeave"
+                    Click="Rating2Btn_OnClick" />
+            <Button x:Name="Rating3Btn"
+                    Content="&#x2606;"
+                    FontSize="24"
+                    Style="{DynamicResource ButtonContentOnly}"
+                    FontWeight="Normal"
+                    ToolTip="Rating"
+                    MouseEnter="Rating3Btn_OnMouseEnter"
+                    MouseLeave="RatingBtns_OnMouseLeave"
+                    Click="Rating3Btn_OnClick" />
+            <Button x:Name="Rating4Btn"
+                    Content="&#x2606;"
+                    FontSize="24"
+                    Style="{DynamicResource ButtonContentOnly}"
+                    FontWeight="Normal"
+                    ToolTip="Rating"
+                    MouseEnter="Rating4Btn_OnMouseEnter"
+                    MouseLeave="RatingBtns_OnMouseLeave"
+                    Click="Rating4Btn_OnClick" />
+            <Button x:Name="Rating5Btn"
+                    Content="&#x2606;"
+                    FontSize="24"
+                    Style="{DynamicResource ButtonContentOnly}"
+                    FontWeight="Normal"
+                    ToolTip="Rating"
+                    MouseEnter="Rating5Btn_OnMouseEnter"
+                    MouseLeave="RatingBtns_OnMouseLeave"
+                    Click="Rating5Btn_OnClick" />
+          </StackPanel>
+
+          <StackPanel x:Name="__PlaylistControls"
+                      Grid.Column="3"
+                      Orientation="Horizontal"
+                      VerticalAlignment="Center"
+                      Margin="10,0">
+            <ToggleButton x:Name="ShuffleToggleBtn"
+                          Content="&#x1f500;"
+                          Padding="1,0,0,2"
+                          Width="32"
+                          Height="32"
+                          Style="{DynamicResource MetroCircleToggleButtonStyle}"
+                          ToolTip="Toggle Loop" />
+            <ToggleButton x:Name="RepeatToggleBtn"
+                          FontSize="16"
+                          Content="&#x221e;"
+                          Padding="0,0,0,4"
+                          Width="32"
+                          Height="32"
+                          Style="{DynamicResource MetroCircleToggleButtonStyle}"
+                          ToolTip="Toggle Loop"
+                          FontWeight="SemiBold" />
+          </StackPanel>
+
+          <Button x:Name="OpenFileBtn"
+                  Grid.Column="4"
+                  Style="{DynamicResource MetroCircleButtonStyle}"
+                  FontSize="16"
+                  Content="&#x23cf;"
+                  Padding="1,0,0,4"
+                  Width="32"
+                  Height="32"
+                  ToolTip="Previous Track"
+                  Margin="10,0" />
+
+          <StackPanel x:Name="__VolumeControls"
+                      Grid.Column="5"
+                      Orientation="Horizontal"
+                      VerticalAlignment="Center"
+                      Margin="10,0">
+            <Button x:Name="VolumeBtn"
+                    Click="VolumeBtn_OnClick"
+                    Style="{DynamicResource ButtonContentOnly}"
+                    Content="&#x1f508;"
+                    Width="32"
+                    Height="32"
+                    Margin="0"
+                    ToolTip="Toggle Mute"
+                    Padding="0,0,8,1"
+                    FontSize="16"
+                    FontWeight="Normal" />
+            <Slider x:Name="VolumeSlider"
+                    SnapsToDevicePixels="True"
+                    Width="100"
+                    Maximum="1"
+                    LargeChange="0.1"
+                    SmallChange="0.05"
+                    ToolTip="Volume"
+                    VerticalAlignment="Center"
+                    Margin="0,2"
+                    Value="1"
+                    IsMoveToPointEnabled="True"
+                    ValueChanged="VolumeSlider_OnValueChanged" />
+          </StackPanel>
+        </Grid>
+      </Grid>
+    </Grid>
+
+    <Separator Grid.Row="1"
+               Margin="5" />
+
+    <Grid Grid.Row="2">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="2*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="5*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="3*" />
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <TreeView x:Name="LibraryTree"
+                Grid.Column="0"
+                Grid.Row="0"
+                Grid.RowSpan="2"
+                Margin="5,5,0,5"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource TextBoxMouseOverBorderBrush}">
+        <TreeViewItem x:Name="LibraryNode"
+                      FontSize="14"
+                      FontWeight="SemiBold"
+                      Header="Library" />
+      </TreeView>
+
+      <GridSplitter Grid.Column="1"
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Width="5"
+                    ResizeBehavior="PreviousAndNext"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    VerticalContentAlignment="Stretch"
+                    Background="{StaticResource TransparentWhiteBrush}" />
+
+      <TextBlock Text="Queue"
+                 Grid.Column="2"
+                 Grid.Row="0"
+                 Margin="5" />
+      <ListBox x:Name="QueueList"
+               Grid.Column="2"
+               Grid.Row="1"
+               Margin="0,0,0,5"
+               BorderThickness="1"
+               BorderBrush="{DynamicResource TextBoxMouseOverBorderBrush}"
+               FontSize="14">
+        <TextBlock Text="Captain-Cool.mp3" />
+      </ListBox>
+
+      <GridSplitter Grid.Column="3"
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Width="5"
+                    ResizeBehavior="PreviousAndNext"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch"
+                    VerticalContentAlignment="Stretch"
+                    Background="{StaticResource TransparentWhiteBrush}" />
+
+      <TextBlock Text="Playlist"
+                 Grid.Column="4"
+                 Grid.Row="0"
+                 Margin="5" />
+      <ListBox x:Name="PlaylistList"
+               Grid.Column="4"
+               Grid.Row="1"
+               Margin="0,0,5,5"
+               BorderBrush="{DynamicResource TextBoxMouseOverBorderBrush}"
+               BorderThickness="1"
+               FontSize="14">
+        <TextBlock Text="Captain-Cool.mp3" />
+      </ListBox>
+    </Grid>
   </Grid>
 </m:MetroWindow>
 

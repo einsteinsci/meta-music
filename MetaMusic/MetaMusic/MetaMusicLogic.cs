@@ -29,6 +29,15 @@ namespace MetaMusic
 			Interval = TimeSpan.FromSeconds(0.5)
 		};
 
+		public int Rating
+		{ get; set; }
+
+		public bool Muted
+		{ get; set; }
+
+		public float Volume
+		{ get; set; }
+
 		public readonly VersatilePlayer Player;
 
 		private IMusicSource _currentTrack;
@@ -36,6 +45,8 @@ namespace MetaMusic
 		public MetaMusicLogic(MainWindow window)
 		{
 			Window = window;
+
+			Volume = 1.0f;
 
 			Player = new VersatilePlayer(FileMediaPlayer, WebHelper, WavHelper);
 
@@ -68,27 +79,128 @@ namespace MetaMusic
 			Window.PlayThumbBtn.Description = desc;
 			Window.Min_PlayBtn.ToolTip = desc;
 
-			bool isPlay = (desc == "Play" || desc == "Resume");
-			if (isPlay)
+			if (desc == "Play" || desc == "Resume")
 			{
-				Window.PlayThumbBtn.ImageSource = Util.LoadImage("Assets/play.png");
-			}
-			else
-			{
-				Window.PlayThumbBtn.ImageSource = Util.LoadImage("Assets/pause.png");
-			}
+				Window.PlayThumbBtn.ImageSource = Util.LoadImage("Assets/tb-play.png");
 
-			if (isPlay)
-			{
 				Window.Min_PlayBtn.Content = MainWindow.PLAY;
 				Window.Min_PlayBtn.FontSize = 16;
 				Window.Min_PlayBtn.Margin = new Thickness { Bottom = 3, Left = 5, Right = 5 };
+
+				Window.PlayBtn.Content = MainWindow.PLAY;
+				Window.PlayBtn.FontSize = 12;
+				Window.PlayBtn.Padding = new Thickness { Bottom = 2, Left = 1 };
 			}
 			else
 			{
+				Window.PlayThumbBtn.ImageSource = Util.LoadImage("Assets/tb-pause.png");
+
 				Window.Min_PlayBtn.Content = MainWindow.PAUSE;
 				Window.Min_PlayBtn.FontSize = 20;
 				Window.Min_PlayBtn.Margin = new Thickness { Bottom = 5, Left = 2, Right = 1.5 };
+
+				Window.PlayBtn.Content = MainWindow.PAUSE;
+				Window.PlayBtn.FontSize = 14;
+				Window.PlayBtn.Padding = new Thickness { Bottom = 3 };
+			}
+		}
+
+		public void UpdateVolume()
+		{
+			Window.Min_VolumeSlider.Value = Volume;
+			Window.VolumeSlider.Value = Volume;
+		}
+
+		public void ToggleMute()
+		{
+			Muted = !Muted;
+			Window.Min_VolumeBtn.Content = Muted ? MainWindow.SPEAKER_OFF : MainWindow.SPEAKER_ON;
+			Window.Min_VolumeBtn.Margin = new Thickness { Right = Muted ? 5 : 16, Left = Muted ? 0 : 2, Bottom = 3 };
+
+			Window.VolumeBtn.Content = Muted ? MainWindow.SPEAKER_OFF : MainWindow.SPEAKER_ON;
+			Window.VolumeBtn.Padding = new Thickness { Right = Muted ? 2 : 8, Bottom = 1 };
+		}
+
+		public void SetRating(int rating)
+		{
+			Rating = rating;
+
+			Window.Rating1Btn.Content = MainWindow.STAR_OFF;
+			Window.Rating2Btn.Content = MainWindow.STAR_OFF;
+			Window.Rating3Btn.Content = MainWindow.STAR_OFF;
+			Window.Rating4Btn.Content = MainWindow.STAR_OFF;
+			Window.Rating5Btn.Content = MainWindow.STAR_OFF;
+
+			if (rating >= 1)
+			{
+				Window.Rating1Btn.Content = MainWindow.STAR_ON;
+			}
+
+			if (rating >= 2)
+			{
+				Window.Rating2Btn.Content = MainWindow.STAR_ON;
+			}
+
+			if (rating >= 3)
+			{
+				Window.Rating3Btn.Content = MainWindow.STAR_ON;
+			}
+
+			if (rating >= 4)
+			{
+				Window.Rating4Btn.Content = MainWindow.STAR_ON;
+			}
+
+			if (rating >= 5)
+			{
+				Window.Rating5Btn.Content = MainWindow.STAR_ON;
+			}
+		}
+
+		public void PreviewRating(int rating)
+		{
+			Brush white = Window.Foreground;
+			Brush dark = new SolidColorBrush(Colors.LightGray);
+
+			Window.Rating1Btn.Foreground = white;
+			Window.Rating2Btn.Foreground = white;
+			Window.Rating3Btn.Foreground = white;
+			Window.Rating4Btn.Foreground = white;
+			Window.Rating5Btn.Foreground = white;
+
+			if (rating == 0 || rating == Rating)
+			{
+				SetRating(Rating); // end preview
+				return;
+			}
+
+			int temp = Rating;
+			SetRating(rating);
+			Rating = temp;
+
+			if (rating >= 1)
+			{
+				Window.Rating1Btn.Foreground = dark;
+			}
+
+			if (rating >= 2)
+			{
+				Window.Rating2Btn.Foreground = dark;
+			}
+
+			if (rating >= 3)
+			{
+				Window.Rating3Btn.Foreground = dark;
+			}
+
+			if (rating >= 4)
+			{
+				Window.Rating4Btn.Foreground = dark;
+			}
+
+			if (rating >= 5)
+			{
+				Window.Rating5Btn.Foreground = dark;
 			}
 		}
 
