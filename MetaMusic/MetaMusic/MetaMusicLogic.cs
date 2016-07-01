@@ -196,68 +196,25 @@ namespace MetaMusic
 
 		public void UpdateSongUI()
 		{
-			if (Player.Source == null)
-			{
-				UI.TimeTxt.Text = "-:-- / -:--";
-				UI.ProgressSlider.Value = 0;
-				UI.ProgressSlider.IsEnabled = false;
-				UI.Min_ProgressSlider.Value = 0;
-				UI.Min_ProgressSlider.IsEnabled = false;
-				UI.SoundCloudLogoBtn.Visibility = Visibility.Collapsed;
+			SongState state = SongState.Load(Player.Source, NowPlaying);
 
-				if (NowPlaying == null)
-				{
-					UI.SongNameTxt.Text = "-";
-					UI.Title = "Meta Music Player";
-				}
-				else
-				{
-					UI.SongNameTxt.Text = NowPlaying.Song.DisplayName;
-					UI.Title = NowPlaying.Song.DisplayName;
-				}
-			}
-			else
-			{
-				UI.TimeTxt.Text = Player.Source.GetDurationString();
-				UI.SoundCloudLogoBtn.Visibility = (Player.Source is SoundCloudMusic).ToVis();
+			UI.SongNameTxt.Text = state.TitleText;
+			UI.Title = state.TitleTextTitleBar;
+			UI.TimeTxt.Text = state.TimeText;
+			UI.SongCoverImg.Source = state.Artwork;
 
-				if (Player.Source.Title != null)
-				{
-					UI.SongNameTxt.Text = Player.Source.Title ?? "";
-					UI.Title = Player.Source.Title ?? "";
-				}
+			UI.ProgressSlider.IsEnabled = state.ProgressMeaningful;
+			UI.Min_ProgressSlider.IsEnabled = state.ProgressMeaningful;
 
-				if (Player.Source.Duration == null)
-				{
-					UI.ProgressSlider.Value = 0;
-					UI.ProgressSlider.IsEnabled = false;
-					UI.Min_ProgressSlider.Value = 0;
-					UI.Min_ProgressSlider.IsEnabled = false;
-				}
-				else
-				{
-					UI.ProgressSlider.IsEnabled = true;
-					UI.Min_ProgressSlider.IsEnabled = true;
+			AdvancingSliders = true;
+			UI.ProgressSlider.Value = state.ProgressValue;
+			UI.Min_ProgressSlider.Value = state.ProgressValue;
+			AdvancingSliders = false;
 
-					AdvancingSliders = true;
-					double progress = Player.Source.Position.TotalSeconds / Player.Source.Duration.Value.TotalSeconds;
-					UI.ProgressSlider.Value = progress;
-					UI.Min_ProgressSlider.Value = progress;
-					AdvancingSliders = false;
-				}
-
-				ILoadingText ilt = Player.Source as ILoadingText;
-				if (ilt != null && !ilt.LoadingText.IsNullOrEmpty())
-				{
-					UI.LoadingMessageTxt.Text = ilt.LoadingText;
-					UI.LoadingMessageTxt.Visibility = Visibility.Visible;
-				}
-				else
-				{
-					UI.LoadingMessageTxt.Text = "";
-					UI.LoadingMessageTxt.Visibility = Visibility.Collapsed;
-				}
-			}
+			UI.SoundCloudLogoBtn.Tag = state.SoundCloudUrl;
+			UI.SoundCloudLogoBtn.Visibility = state.IsSoundCloud.ToVis();
+			UI.LoadingMessageTxt.Text = state.LoadingText;
+			UI.LoadingMessageTxt.Visibility = state.ShowLoadingMessage.ToVis();
 
 			if (!_previewingRating)
 			{

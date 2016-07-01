@@ -13,6 +13,15 @@ namespace MetaMusic.Sources
 		string Title
 		{ get; }
 
+		string Author
+		{ get; }
+
+		string Album
+		{ get; }
+
+		byte[] CoverArtData
+		{ get; }
+
 		bool IsPlaying
 		{ get; }
 

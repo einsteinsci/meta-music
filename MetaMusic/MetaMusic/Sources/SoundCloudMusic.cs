@@ -34,6 +34,13 @@ namespace MetaMusic.Sources
 		public string Title
 		{ get; private set; }
 
+		public string Author
+		{ get; private set; }
+
+		public byte[] CoverArtData
+		{ get; private set; }
+		private string _coverArtUrl;
+
 		public TimeSpan Position
 		{
 			get
@@ -61,9 +68,13 @@ namespace MetaMusic.Sources
 		public string LoadingText
 		{ get; private set; }
 
+		public string Album => null;
+
 		public event EventHandler TitleChanged;
 
 		private bool _hasHelperLoaded;
+
+		private Thread _artworkThread;
 
 		public SoundCloudMusic(string permUrl, WebMusicHelper helper)
 		{
@@ -102,7 +113,14 @@ namespace MetaMusic.Sources
 			StreamURL = root.stream_url + "?client_id=" + SoundCloudPlayer.__CLIENTID__;
 
 			Title = root.title;
+			Author = root.user?.username ?? "UNKNOWN";
 			TitleChanged?.Invoke(this, new EventArgs());
+
+			_coverArtUrl = root.artwork_url;
+			if (_coverArtUrl.IsNullOrEmpty())
+			{
+				_coverArtUrl = root.user.avatar_url;
+			}
 
 			int durationMS = root.duration;
 			Duration = TimeSpan.FromMilliseconds(durationMS);
@@ -157,8 +175,10 @@ namespace MetaMusic.Sources
 
 					WebHelper.Play(() => { LoadingText = null; });
 				});
-
+				loader.Name = "SoundCloud Song Loader";
 				loader.Start();
+
+				StartArtworkLoader();
 			}
 			else
 			{
@@ -166,6 +186,28 @@ namespace MetaMusic.Sources
 			}
 
 			IsPlaying = true;
+		}
+
+		private void StartArtworkLoader()
+		{
+			if (_artworkThread != null && _artworkThread.IsAlive)
+			{
+				_artworkThread.Abort();
+			}
+
+			_artworkThread = new Thread(() => {
+				while (_coverArtUrl.IsNullOrEmpty())
+				{
+					Thread.Sleep(100);
+				}
+
+				using (WebClient client = new WebClient())
+				{
+					CoverArtData = client.DownloadData(_coverArtUrl);
+				}
+			});
+			_artworkThread.Name = "SoundCloud Song Artwork Loader";
+			_artworkThread.Start();
 		}
 
 		public void Pause()
@@ -179,6 +221,8 @@ namespace MetaMusic.Sources
 		{
 			WebHelper.Stop();
 			IsPlaying = false;
+
+			_artworkThread.Abort();
 		}
 	}
 }

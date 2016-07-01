@@ -326,12 +326,17 @@ namespace MetaMusic
 
 		private void SoundCloudLogoBtn_OnMouseLeave(object sender, MouseEventArgs e)
 		{
-			SoundCloudLogoBtn.Opacity = 0.7;
+			SoundCloudLogoBtn.Opacity = 0.5;
 		}
 
 		private void SoundCloudLogoBtn_OnClick(object sender, RoutedEventArgs e)
 		{
-			Process.Start("https://soundcloud.com");
+			string url = SoundCloudLogoBtn.Tag as string;
+
+			if (Logic.Player.SoundCloudPlayer.CanPlay(url))
+			{
+				Process.Start(url);
+			}
 		}
 
 		private void AccentColorMenu_OnClick(object senderObj, RoutedEventArgs e)

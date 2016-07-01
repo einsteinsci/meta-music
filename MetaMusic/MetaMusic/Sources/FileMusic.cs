@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
+using Id3;
+using Id3.Frames;
+
 using MetaMusic.Players;
 
 namespace MetaMusic.Sources
@@ -15,7 +18,20 @@ namespace MetaMusic.Sources
 		public string FilePath
 		{ get; private set; }
 
-		public string Title => Path.GetFileName(FilePath);
+		public string Title => _title ?? TitlePath;
+
+		public string TitlePath => Path.GetFileName(FilePath);
+
+		public string Author
+		{ get; private set; }
+
+		public string Album
+		{ get; private set; }
+
+		public byte[] CoverArtData
+		{ get; private set; }
+
+		private string _title;
 
 		public TimeSpan? Duration
 		{
@@ -52,6 +68,7 @@ namespace MetaMusic.Sources
 			FilePath = path;
 			_player = player;
 			_player.Open(new Uri(FilePath));
+			LoadMetadata();
 		}
 
 		public void Open(string path = null)
@@ -61,9 +78,34 @@ namespace MetaMusic.Sources
 				FilePath = path;
 			}
 
-			if (path != null) // still
+			if (FilePath != null) // still
 			{
 				_player.Open(new Uri(FilePath));
+				LoadMetadata();
+			}
+		}
+
+		public void LoadMetadata()
+		{
+			if (!File.Exists(FilePath))
+			{
+				Author = "???";
+				return;
+			}
+
+			Mp3File file = new Mp3File(FilePath);
+			if (file.HasTags)
+			{
+				Id3Tag tag = file.GetTag(Id3TagFamily.FileStartTag);
+				Author = tag.Artists.Values.FirstOrDefault();
+				Album = tag.Album.Value;
+				_title = tag.Title;
+
+				PictureFrame frame = tag.Pictures.FirstOrDefault();
+				if (frame != null)
+				{
+					CoverArtData = frame.PictureData;
+				}
 			}
 		}
 

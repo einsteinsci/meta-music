@@ -42,6 +42,14 @@
     <Reference Include="BrawlLib">
       <HintPath>..\..\..\..\..\Documents\Soft Install\BrawlBox\BrawlLib.dll</HintPath>
     </Reference>
+    <Reference Include="Id3, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ID3.0.3.0\lib\net40\Id3.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Id3.Files, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ID3.Files.0.3.0\lib\net40\Id3.Files.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="MahApps.Metro, Version=1.2.4.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.2.4.0\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
@@ -106,6 +114,7 @@
     <Compile Include="PluginLoader.cs" />
     <Compile Include="PlayerSettings.cs" />
     <Compile Include="SongLibrary.cs" />
+    <Compile Include="SongState.cs" />
     <Compile Include="Sources\BrstmMusic.cs" />
     <Compile Include="Sources\ILoadingMessage.cs" />
     <Compile Include="Sources\SoundCloudMusic.cs" />

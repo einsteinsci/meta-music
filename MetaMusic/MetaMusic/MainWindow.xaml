@@ -254,12 +254,15 @@
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
 
-      <Image x:Name="SongCoverImg"
-             Grid.Column="0"
-             Stretch="Fill"
-             Margin="10"
-             Width="96"
-             Height="96" />
+      <Grid Grid.Column="0"
+            Margin="10"
+            Width="96"
+            Height="96">
+        <Image x:Name="SongCoverImg"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Stretch="UniformToFill" />
+      </Grid>
 
       <Grid Grid.Column="1">
         <Grid.RowDefinitions>
@@ -306,7 +309,7 @@
                   HorizontalAlignment="Right"
                   Margin="0,0,10,0"
                   Padding="0"
-                  Opacity="0.7"
+                  Opacity="0.5"
                   Width="104"
                   Height="32"
                   Style="{DynamicResource ButtonContentOnly}"

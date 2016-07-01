@@ -31,6 +31,12 @@ namespace MetaMusic.Sources
 		public string ConvertedFilePath
 		{ get; private set; }
 
+		public string Author => null;
+
+		public string Album => null;
+
+		public byte[] CoverArtData => null;
+
 		public TimeSpan? Duration => WavHelper.Duration;
 
 		public string Title => Path.GetFileName(FilePath);

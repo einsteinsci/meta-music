@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -101,6 +102,17 @@ namespace MetaMusic
 			}
 
 			return queue.Peek();
+		}
+
+		public static ImageSource LoadImageFromBytes(byte[] data)
+		{
+			MemoryStream byteStream = new MemoryStream(data);
+			BitmapImage image = new BitmapImage();
+			image.BeginInit();
+			image.StreamSource = byteStream;
+			image.EndInit();
+
+			return image;
 		}
 	}
 }
