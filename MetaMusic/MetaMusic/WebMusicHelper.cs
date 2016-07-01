@@ -49,6 +49,9 @@ namespace MetaMusic
 		public float CurrentVolume
 		{ get; set; }
 
+		public bool Muted
+		{ get; set; }
+
 		public TimeSpan? SeekPosition
 		{ get; set; }
 
@@ -215,6 +218,8 @@ namespace MetaMusic
 				{
 					_worker?.ReportProgress(0, timer.Elapsed);
 				}
+
+				waveOut.Volume = Muted ? 0 : CurrentVolume;
 
 				timer.Restart();
 

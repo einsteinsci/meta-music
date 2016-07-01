@@ -24,6 +24,9 @@ namespace MetaMusic.Players
 		IMusicSource Source
 		{ get; }
 
+		bool Muted
+		{ get; set; }
+
 		void PlaySrc(IMusicSource source);
 
 		void Resume();

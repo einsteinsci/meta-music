@@ -16,6 +16,18 @@ namespace MetaMusic.Players
 
 		public WebMusicHelper WebHelper
 		{ get; private set; }
+		
+		public override bool Muted
+		{
+			get
+			{
+				return WebHelper.Muted;
+			}
+			set
+			{
+				WebHelper.Muted = value;
+			}
+		}
 
 		public Exception LastException => Source.LastException;
 
@@ -30,7 +42,6 @@ namespace MetaMusic.Players
 		public SoundCloudPlayer(WebMusicHelper helper)
 		{
 			WebHelper = helper;
-			Volume = 0.3f;
 		}
 
 		public void Play(string url)
@@ -39,13 +50,6 @@ namespace MetaMusic.Players
 			Source.Load();
 
 			Source.Play();
-		}
-
-		public override void Play(SoundCloudMusic source)
-		{
-			base.Play(source);
-
-			WebHelper.CurrentVolume = Volume;
 		}
 
 		public override bool CanPlay(string sourceUri)
@@ -66,6 +70,7 @@ namespace MetaMusic.Players
 		public override void SetVolume(PlayerSettings settings, double volume)
 		{
 			settings.VolumeSoundCloud = volume;
+			WebHelper.CurrentVolume = (float)volume;
 		}
 	}
 }

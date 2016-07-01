@@ -14,16 +14,11 @@ namespace MetaMusic.Players
 		public T Source
 		{ get; protected set; }
 
-		public float Volume
-		{ get; set; }
-
 		public abstract string RegistryName
 		{ get; }
 
-		protected MusicPlayerBase()
-		{
-			Volume = 1.0f;
-		}
+		public abstract bool Muted
+		{ get; set; }
 
 		public virtual void Play(T source)
 		{
@@ -75,15 +70,9 @@ namespace MetaMusic.Players
 
 		public abstract IMusicSource MakeSource(string sourceUri);
 
-		public virtual double GetVolume(PlayerSettings settings)
-		{
-			return settings.VolumeFile;
-		}
+		public abstract double GetVolume(PlayerSettings settings);
 
-		public virtual void SetVolume(PlayerSettings settings, double volume)
-		{
-			settings.VolumeFile = volume;
-		}
+		public abstract void SetVolume(PlayerSettings settings, double volume);
 
 		IMusicSource IMusicPlayer.Source => Source;
 	}

@@ -14,11 +14,28 @@ namespace MetaMusic.Players
 	{
 		private readonly MediaPlayer _player;
 
+		public override bool Muted
+		{
+			get
+			{
+				return _muted;
+			}
+			set
+			{
+				_muted = value;
+				_player.Volume = _muted ? 0 : _bufferVolume;
+			}
+		}
+		private bool _muted;
+
+		private double _bufferVolume;
+
 		public override string RegistryName => nameof(FilePlayer);
 
 		public FilePlayer(MediaPlayer player)
 		{
 			_player = player;
+			_bufferVolume = 1.0;
 		}
 
 		public void Play(string path)
@@ -35,6 +52,19 @@ namespace MetaMusic.Players
 		public override IMusicSource MakeSource(string source)
 		{
 			return new FileMusic(source, _player);
+		}
+
+		public override double GetVolume(PlayerSettings settings)
+		{
+			return settings.VolumeFile;
+		}
+
+		public override void SetVolume(PlayerSettings settings, double volume)
+		{
+			settings.VolumeFile = volume;
+
+			_player.Volume = volume;
+			_bufferVolume = volume;
 		}
 	}
 }

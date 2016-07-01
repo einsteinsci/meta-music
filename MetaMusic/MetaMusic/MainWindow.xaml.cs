@@ -103,6 +103,7 @@ namespace MetaMusic
 			debugLines.Clear();
 
 			debugLines.Add("Now Playing: " + (Logic.NowPlaying?.Song.DisplayName ?? "-NULL-"));
+			debugLines.Add("BRSTM Volume: " + Logic.Player.BrstmPlayer.WavHelper.CurrentVolume);
 		}
 
 		public void ToggleMinimalist()

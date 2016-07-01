@@ -14,6 +14,18 @@ namespace MetaMusic.Players
 		public WavSoundHelper WavHelper
 		{ get; private set; }
 
+		public override bool Muted
+		{
+			get
+			{
+				return WavHelper.Muted;
+			}
+			set
+			{
+				WavHelper.Muted = value;
+			}
+		}
+
 		public Exception LastException => Source.LastException;
 
 		public bool HasThrown => Source.HasThrown;
@@ -27,7 +39,6 @@ namespace MetaMusic.Players
 		public BrstmPlayer(WavSoundHelper helper)
 		{
 			WavHelper = helper;
-			Volume = 0.3f;
 		}
 
 		public void Play(string path)
@@ -36,13 +47,6 @@ namespace MetaMusic.Players
 			Source.Load();
 
 			Source.Play();
-		}
-
-		public override void Play(BrstmMusic source)
-		{
-			base.Play(source);
-
-			WavHelper.CurrentVolume = Volume;
 		}
 
 		public override bool CanPlay(string sourceUri)
@@ -63,6 +67,7 @@ namespace MetaMusic.Players
 		public override void SetVolume(PlayerSettings settings, double volume)
 		{
 			settings.VolumeBrstm = volume;
+			WavHelper.CurrentVolume = (float)volume;
 		}
 	}
 }

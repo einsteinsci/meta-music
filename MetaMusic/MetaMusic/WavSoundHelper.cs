@@ -51,6 +51,9 @@ namespace MetaMusic
 		public float CurrentVolume
 		{ get; set; }
 
+		public bool Muted
+		{ get; set; }
+
 		public TimeSpan? SeekPosition
 		{ get; set; }
 
@@ -130,29 +133,29 @@ namespace MetaMusic
 			
 			_onPlayStart();
 			
-			using (WaveFileReader reader = new WaveFileReader(FilePath))
+			using (WaveChannel32 pcm = new WaveChannel32(new WaveFileReader(FilePath)))
 			{
-				Duration = reader.TotalTime;
+				Duration = pcm.TotalTime;
 
 				using (WaveOut waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
 				{
-					_playSoundStream(waveOut, reader);
+					_playSoundStream(waveOut, pcm);
 				}
 			}
 		}
 
-		private void _playSoundStream(WaveOut waveOut, WaveStream blockAlignedStream)
+		private void _playSoundStream(WaveOut waveOut, WaveChannel32 pcm)
 		{
-			if (blockAlignedStream == null)
+			if (pcm == null)
 			{
-				throw new ArgumentNullException(nameof(blockAlignedStream));
+				throw new ArgumentNullException(nameof(pcm));
 			}
 
 			Stopwatch timer = new Stopwatch();
 			timer.Start();
 
-			waveOut.Init(blockAlignedStream);
-			waveOut.Volume = CurrentVolume;
+			waveOut.Init(pcm);
+			pcm.Volume = CurrentVolume;
 			waveOut.Play();
 			
 			while (waveOut.PlaybackState == PlaybackState.Playing || waveOut.PlaybackState == PlaybackState.Paused)
@@ -175,17 +178,17 @@ namespace MetaMusic
 
 				if (SeekPosition != null)
 				{
-					long newPos = (long)(blockAlignedStream.WaveFormat.AverageBytesPerSecond * SeekPosition.Value.TotalSeconds);
+					long newPos = (long)(pcm.WaveFormat.AverageBytesPerSecond * SeekPosition.Value.TotalSeconds);
 
 					// Force it to align to a block boundary
-					if (newPos % blockAlignedStream.WaveFormat.BlockAlign != 0)
+					if (newPos % pcm.WaveFormat.BlockAlign != 0)
 					{
-						newPos -= newPos % blockAlignedStream.WaveFormat.BlockAlign;
+						newPos -= newPos % pcm.WaveFormat.BlockAlign;
 					}
 					// Force new position into valid range
-					newPos = Math.Max(0, Math.Min(blockAlignedStream.Length, newPos));
+					newPos = Math.Max(0, Math.Min(pcm.Length, newPos));
 
-					blockAlignedStream.Position = newPos;
+					pcm.Position = newPos;
 
 					TimeSpan diff = SeekPosition.Value - Progress;
 					_worker?.ReportProgress(0, diff);
@@ -196,6 +199,8 @@ namespace MetaMusic
 				{
 					_worker?.ReportProgress(0, timer.Elapsed);
 				}
+
+				pcm.Volume = Muted ? 0 : CurrentVolume;
 
 				timer.Restart();
 

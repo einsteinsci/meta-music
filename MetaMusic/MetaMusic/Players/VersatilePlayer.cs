@@ -29,10 +29,26 @@ namespace MetaMusic.Players
 		public PlayerRegistry Registry
 		{ get; private set; }
 
+		public bool Muted
+		{
+			get
+			{
+				return ActivePlayer?.Muted ?? false;
+			}
+			set
+			{
+				if (ActivePlayer != null)
+				{
+					ActivePlayer.Muted = value;
+				}
+			}
+		}
+
 		public string RegistryName => nameof(VersatilePlayer);
 
 		public event EventHandler TitleChanged;
 
+		[Obsolete]
 		public string LoadingText
 		{
 			get

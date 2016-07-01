@@ -200,7 +200,9 @@ namespace MetaMusic
 			{
 				UI.TimeTxt.Text = "-:-- / -:--";
 				UI.ProgressSlider.Value = 0;
+				UI.ProgressSlider.IsEnabled = false;
 				UI.Min_ProgressSlider.Value = 0;
+				UI.Min_ProgressSlider.IsEnabled = false;
 				UI.SoundCloudLogoBtn.Visibility = Visibility.Collapsed;
 
 				if (NowPlaying == null)
@@ -228,10 +230,15 @@ namespace MetaMusic
 				if (Player.Source.Duration == null)
 				{
 					UI.ProgressSlider.Value = 0;
+					UI.ProgressSlider.IsEnabled = false;
 					UI.Min_ProgressSlider.Value = 0;
+					UI.Min_ProgressSlider.IsEnabled = false;
 				}
 				else
 				{
+					UI.ProgressSlider.IsEnabled = true;
+					UI.Min_ProgressSlider.IsEnabled = true;
+
 					AdvancingSliders = true;
 					double progress = Player.Source.Position.TotalSeconds / Player.Source.Duration.Value.TotalSeconds;
 					UI.ProgressSlider.Value = progress;
@@ -361,6 +368,8 @@ namespace MetaMusic
 		public void ToggleMute()
 		{
 			Settings.Muted = !Settings.Muted;
+			Player.Muted = Settings.Muted;
+
 			UI.Min_VolumeBtn.Content = Settings.Muted ? MainWindow.SPEAKER_OFF : MainWindow.SPEAKER_ON;
 			UI.Min_VolumeBtn.Margin = new Thickness { Right = Settings.Muted ? 5 : 16, Left = Settings.Muted ? 0 : 2, Bottom = 3 };
 
