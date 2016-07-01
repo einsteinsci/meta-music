@@ -30,7 +30,17 @@ namespace MetaMusic.Sources
 			}
 		}
 
-		public TimeSpan Position => _player.Position;
+		public TimeSpan Position
+		{
+			get
+			{
+				return _player.Position;
+			}
+			set
+			{
+				_player.Position = value;
+			}
+		}	
 
 		public bool IsPlaying
 		{ get; set; }

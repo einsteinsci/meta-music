@@ -8,7 +8,7 @@ namespace MetaMusic.Sources
 		{ get; }
 
 		TimeSpan Position
-		{ get; }
+		{ get; set; }
 
 		string Title
 		{ get; }

@@ -4,50 +4,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using MetaMusic.Sources;
-
 using Newtonsoft.Json;
+
+using UltimateUtil;
 
 namespace MetaMusic
 {
 	[JsonObject(MemberSerialization.OptIn)]
 	public sealed class PlaylistItem
 	{
-		public enum PlayListItemType
+		[JsonProperty]
+		public string Source
+		{ get; set; }
+
+		public LibraryItem Song
+		{ get; set; }
+
+		public void LoadFromLibrary(SongLibrary library)
 		{
-			File,
-			BRSTM,
-			SoundCloud
+			Song = library.Retrieve(Source);
 		}
-
-		public IMusicSource SoundSource
-		{ get; private set; }
-
-		[JsonProperty]
-		public string CustomName
-		{ get; set; }
-
-		[JsonProperty]
-		public int? Rating
-		{ get; set; }
-
-		[JsonProperty]
-		public PlayListItemType Type
-		{ get; set; }
-
-		[JsonProperty]
-		public TimeSpan Duration
-		{ get; set; }
-
-		// For local types, this means the file path. For web types, this means the URL.
-		public string Location
-		{ get; set; }
-
-		public PlaylistItem(IMusicSource source, string name)
-		{
-			
-		}
-		internal PlaylistItem()
-		{ }
 	}
 }

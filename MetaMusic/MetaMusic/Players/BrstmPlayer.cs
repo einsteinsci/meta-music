@@ -8,7 +8,8 @@ using MetaMusic.Sources;
 
 namespace MetaMusic.Players
 {
-	public class BrstmPlayer : MusicPlayerBase<BrstmMusic>, ILoadingText
+	[MusicPlayer]
+	public class BrstmPlayer : MusicPlayerBase<BrstmMusic>, ILoadingText, ILastException
 	{
 		public WavSoundHelper WavHelper
 		{ get; private set; }
@@ -18,6 +19,10 @@ namespace MetaMusic.Players
 		public bool HasThrown => Source.HasThrown;
 
 		public string LoadingText => Source.LoadingText;
+
+		public bool HasLoaded => Source.HasLoaded;
+
+		public override string RegistryName => nameof(BrstmPlayer);
 
 		public BrstmPlayer(WavSoundHelper helper)
 		{
@@ -38,6 +43,26 @@ namespace MetaMusic.Players
 			base.Play(source);
 
 			WavHelper.CurrentVolume = Volume;
+		}
+
+		public override bool CanPlay(string sourceUri)
+		{
+			return sourceUri.ToLower().EndsWith(".brstm");
+		}
+
+		public override IMusicSource MakeSource(string source)
+		{
+			return new BrstmMusic(source, WavHelper);
+		}
+
+		public override double GetVolume(PlayerSettings settings)
+		{
+			return settings.VolumeBrstm;
+		}
+
+		public override void SetVolume(PlayerSettings settings, double volume)
+		{
+			settings.VolumeBrstm = volume;
 		}
 	}
 }

@@ -14,7 +14,7 @@ using UltimateUtil;
 
 namespace MetaMusic.Sources
 {
-	public sealed class SoundCloudMusic : IMusicSource, ILastException
+	public sealed class SoundCloudMusic : IMusicSource, ILastException, ILoadingText
 	{
 		public WebMusicHelper WebHelper
 		{ get; private set; }
@@ -34,7 +34,17 @@ namespace MetaMusic.Sources
 		public string Title
 		{ get; private set; }
 
-		public TimeSpan Position => WebHelper.Progress;
+		public TimeSpan Position
+		{
+			get
+			{
+				return WebHelper.Progress;
+			}
+			set
+			{
+				WebHelper.SeekPosition = value;
+			}
+		}
 
 		public bool IsPlaying
 		{ get; private set; }
@@ -106,7 +116,7 @@ namespace MetaMusic.Sources
 
 			HasLoaded = true;
 
-			LoadingText = "Starting song '{0}'...".Fmt(Title);
+			LoadingText = "Decompressing song '{0}'...".Fmt(Title);
 		}
 
 		private bool _isValidTrack(dynamic root)

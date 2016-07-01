@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 using MetaMusic.Sources;
 
+using UltimateUtil.Registries;
+
 namespace MetaMusic.Players
 {
 	public interface IMusicPlayer<T> : IMusicPlayer
@@ -17,7 +19,7 @@ namespace MetaMusic.Players
 		void Play(T source);
 	}
 
-	public interface IMusicPlayer
+	public interface IMusicPlayer : IRegisterable
 	{
 		IMusicSource Source
 		{ get; }
@@ -31,5 +33,13 @@ namespace MetaMusic.Players
 		void TogglePause();
 
 		void Stop();
+
+		bool CanPlay(string sourceUri);
+
+		IMusicSource MakeSource(string sourceUri);
+
+		double GetVolume(PlayerSettings settings);
+
+		void SetVolume(PlayerSettings settings, double volume);
 	}
 }

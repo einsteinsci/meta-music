@@ -51,6 +51,9 @@ namespace MetaMusic
 		public float CurrentVolume
 		{ get; set; }
 
+		public TimeSpan? SeekPosition
+		{ get; set; }
+
 		private bool _stopped = true;
 
 		private BackgroundWorker _worker;
@@ -72,8 +75,9 @@ namespace MetaMusic
 				WorkerSupportsCancellation = true
 			};
 
+			Progress = TimeSpan.Zero;
 			_worker.DoWork += (s, e) => { _worker_DoWork(); };
-			_worker.ProgressChanged += (s, e) => { Progress = (TimeSpan)e.UserState; };
+			_worker.ProgressChanged += (s, e) => { Progress += (TimeSpan)e.UserState; };
 
 			IsLoaded = true;
 			HasThrown = false;
@@ -150,7 +154,7 @@ namespace MetaMusic
 			waveOut.Init(blockAlignedStream);
 			waveOut.Volume = CurrentVolume;
 			waveOut.Play();
-
+			
 			while (waveOut.PlaybackState == PlaybackState.Playing || waveOut.PlaybackState == PlaybackState.Paused)
 			{
 				if (IsPaused)
@@ -169,7 +173,31 @@ namespace MetaMusic
 					waveOut.Stop();
 				}
 
-				_worker?.ReportProgress(0, timer.Elapsed);
+				if (SeekPosition != null)
+				{
+					long newPos = (long)(blockAlignedStream.WaveFormat.AverageBytesPerSecond * SeekPosition.Value.TotalSeconds);
+
+					// Force it to align to a block boundary
+					if (newPos % blockAlignedStream.WaveFormat.BlockAlign != 0)
+					{
+						newPos -= newPos % blockAlignedStream.WaveFormat.BlockAlign;
+					}
+					// Force new position into valid range
+					newPos = Math.Max(0, Math.Min(blockAlignedStream.Length, newPos));
+
+					blockAlignedStream.Position = newPos;
+
+					TimeSpan diff = SeekPosition.Value - Progress;
+					_worker?.ReportProgress(0, diff);
+
+					SeekPosition = null;
+				}
+				else
+				{
+					_worker?.ReportProgress(0, timer.Elapsed);
+				}
+
+				timer.Restart();
 
 				Thread.Sleep(100);
 			}

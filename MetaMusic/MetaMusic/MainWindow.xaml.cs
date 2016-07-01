@@ -18,6 +18,8 @@ using System.Windows.Threading;
 using MahApps.Metro;
 using MahApps.Metro.Controls;
 
+using UltimateUtil;
+
 namespace MetaMusic
 {
 	/// <summary>
@@ -54,7 +56,8 @@ namespace MetaMusic
 		public const int MIN_MINWIDTH = 185;
 		public const int FULL_MINWIDTH = 710;
 
-		//private FlashWindowHelper _flashHelper = new FlashWindowHelper();
+		public const int MIN_MINHEIGHT = 0;
+		public const int FULL_MINHEIGHT = 400;
 
 		public MetaMusicLogic Logic
 		{ get; private set; }
@@ -67,27 +70,13 @@ namespace MetaMusic
 		public double LastHeight
 		{ get; private set; }
 
-		//public static readonly DependencyProperty ColorsDepProperty = DependencyProperty.Register("Colors",
-		//	typeof(List<KeyValuePair<string, Color>>), typeof(MainWindow),
-		//	new PropertyMetadata(new List<KeyValuePair<string, Color>>()));
-		//
-		//public List<KeyValuePair<string, Color>> AccentColors
-		//{
-		//	get
-		//	{
-		//		return (List<KeyValuePair<string, Color>>)GetValue(ColorsDepProperty);
-		//	}
-		//	set
-		//	{
-		//		SetValue(ColorsDepProperty, value);
-		//	}
-		//}
-
 		private readonly List<string> debugLines = new List<string>();
 
 		private bool _playMode;
 
 		private bool _windowLoaded;
+
+		private bool _seeking;
 
 		public MainWindow()
 		{
@@ -105,11 +94,6 @@ namespace MetaMusic
 				TitleBtn.ToolTip = string.Join("\n", debugLines);
 			};
 
-			//AccentColors = (from prop in typeof(Colors).GetProperties()
-			//	where typeof(Color).IsAssignableFrom(prop.PropertyType)
-			//	select new KeyValuePair<string, Color>(prop.Name, (Color)prop.GetValue(null))).ToList();
-			
-
 			Tuple<AppTheme, Accent> theme = ThemeManager.DetectAppStyle(Application.Current);
 			ThemeManager.ChangeAppStyle(this, theme.Item2, theme.Item1);
 		}
@@ -118,8 +102,7 @@ namespace MetaMusic
 		{
 			debugLines.Clear();
 
-			debugLines.Add("Volume: " + Min_VolumeSlider.Value.ToString("F2"));
-			debugLines.Add("Width: " + Width);
+			debugLines.Add("Now Playing: " + (Logic.NowPlaying?.Song.DisplayName ?? "-NULL-"));
 		}
 
 		public void ToggleMinimalist()
@@ -134,6 +117,7 @@ namespace MetaMusic
 			MinimalistMenuItem.IsChecked = IsMinimalist;
 
 			MaxHeight = IsMinimalist ? 39.0 : double.PositiveInfinity;
+			MinHeight = IsMinimalist ? MIN_MINHEIGHT : FULL_MINHEIGHT;
 			Height = IsMinimalist ? 39.0 : LastHeight;
 			MinimalistBtn.Content = IsMinimalist ? NORMAL_WINDOW : MINIMALIST;
 			IsMaxRestoreButtonEnabled = !IsMinimalist;
@@ -147,6 +131,8 @@ namespace MetaMusic
 			Min_ProgressSeparator.Visibility = IsMinimalist.ToVis();
 
 			UpdateMinimalistControlsVisibility(Width);
+
+			Logic.Settings.Minimalist = IsMinimalist;
 		}
 
 		public void UpdateMinimalistControlsVisibility(double width)
@@ -157,17 +143,17 @@ namespace MetaMusic
 			{
 				Min_ProgressSlider.Visibility = (width > HIDE_PROGRESS).ToVis();
 				Min_VolumeGrid.Visibility = (width > HIDE_VOLUME).ToVis();
-				Title = width > HIDE_SONGNAME ? "Captain-Cool.mp3" : "";
+				Title = width > HIDE_SONGNAME ? (Logic.NowPlaying?.Song.DisplayName ?? "") : "";
 				Min_ProgressSeparator.Visibility = (width > HIDE_SONGNAME).ToVis();
 				Min_FlowControlPanel.Visibility = (width > HIDE_CONTROLS).ToVis();
 			}
 			else
 			{
-				Title = "Captain-Cool.mp3";
+				Title = Logic.NowPlaying?.Song.DisplayName ?? "";
 			}
 		}
 
-		public static void ChangeAppTheme(string theme)
+		public void ChangeAppTheme(string theme)
 		{
 			ThemeManager.ChangeAppStyle(Application.Current, ThemeManager.GetAccent(theme),
 				ThemeManager.DetectAppStyle().Item1);
@@ -185,6 +171,8 @@ namespace MetaMusic
 
 			Logic.UpdatePlayBtn(_playMode ? "Pause" : "Play");
 			DebugTimer.Start();
+
+			Logic.LoadUISettings();
 		}
 
 		private void MainWindow_OnSizeChanged(object sender, SizeChangedEventArgs e)
@@ -239,14 +227,8 @@ namespace MetaMusic
 
 		private void PlayBtn_OnClick(object sender, RoutedEventArgs e)
 		{
-			//if (!Logic.Timer.IsEnabled)
-			//{
-			//	Logic.Timer.Start();
-			//}
-			//
-			//Logic.TogglePlay();
-
 			_playMode = !_playMode;
+			Logic.TogglePlay();
 			Logic.UpdatePlayBtn(_playMode ? "Pause" : "Play");
 		}
 
@@ -261,9 +243,9 @@ namespace MetaMusic
 		private void VolumeBtn_OnClick(object sender, RoutedEventArgs e)
 		{
 			Logic.ToggleMute();
-
 		}
 
+		#region ratings
 		private void Rating1Btn_OnClick(object sender, RoutedEventArgs e)
 		{
 			Logic.SetRating(1);
@@ -323,6 +305,7 @@ namespace MetaMusic
 		{
 			Logic.PreviewRating(0);
 		}
+		#endregion ratings
 
 		private void VolumeSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
 		{
@@ -331,7 +314,7 @@ namespace MetaMusic
 				return;
 			}
 
-			Logic.Volume = (float)e.NewValue;
+			Logic.Player.SetVolume(Logic.Settings, e.NewValue);
 			Logic.UpdateVolume();
 		}
 
@@ -358,19 +341,22 @@ namespace MetaMusic
 				return;
 			}
 
-			string theme = sender.Header as string;
-			ChangeAppTheme(theme);
-			
-			foreach (object child in ThemeMenuRoot.Items)
-			{
-				MenuItem colorItem = child as MenuItem;
+			Logic.DoThemeChange(sender);
+		}
 
-				if (colorItem != null && colorItem.Header != sender.Header)
-				{
-					colorItem.IsChecked = false;
-				}
+		private void ProgressSlider_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+		{
+			if (!_windowLoaded || Logic.AdvancingSliders)
+			{
+				return;
 			}
-			
+
+			if (!_seeking && e.OldValue != e.NewValue)
+			{
+				_seeking = true;
+				Logic.SetSongProgress(e.NewValue);
+				_seeking = false;
+			}
 		}
 	}
 }

@@ -17,6 +17,9 @@ namespace MetaMusic.Players
 		public float Volume
 		{ get; set; }
 
+		public abstract string RegistryName
+		{ get; }
+
 		protected MusicPlayerBase()
 		{
 			Volume = 1.0f;
@@ -66,6 +69,20 @@ namespace MetaMusic.Players
 				Source.Stop();
 				Source = null;
 			}
+		}
+
+		public abstract bool CanPlay(string sourceUri);
+
+		public abstract IMusicSource MakeSource(string sourceUri);
+
+		public virtual double GetVolume(PlayerSettings settings)
+		{
+			return settings.VolumeFile;
+		}
+
+		public virtual void SetVolume(PlayerSettings settings, double volume)
+		{
+			settings.VolumeFile = volume;
 		}
 
 		IMusicSource IMusicPlayer.Source => Source;

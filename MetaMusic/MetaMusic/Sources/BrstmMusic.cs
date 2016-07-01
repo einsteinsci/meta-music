@@ -20,7 +20,7 @@ using UltimateUtil;
 
 namespace MetaMusic.Sources
 {
-	public class BrstmMusic : IMusicSource
+	public class BrstmMusic : IMusicSource, ILoadingText
 	{
 		public WavSoundHelper WavHelper
 		{ get; private set; }
@@ -35,7 +35,17 @@ namespace MetaMusic.Sources
 
 		public string Title => Path.GetFileName(FilePath);
 
-		public TimeSpan Position => WavHelper.Progress;
+		public TimeSpan Position
+		{
+			get
+			{
+				return WavHelper.Progress;
+			}
+			set
+			{
+				WavHelper.SeekPosition = value;
+			}
+		}
 
 		public bool IsPlaying
 		{ get; private set; }
@@ -78,7 +88,7 @@ namespace MetaMusic.Sources
 
 			WavHelper.LoadFromPath(ConvertedFilePath);
 
-			LoadingText = "Starting song '{0}'...".Fmt(Title);
+			LoadingText = "Decompressing song '{0}'...".Fmt(Title);
 
 			HasLoaded = true;
 		}

@@ -8,6 +8,7 @@ using MetaMusic.Sources;
 
 namespace MetaMusic.Players
 {
+	[MusicPlayer]
 	public class SoundCloudPlayer : MusicPlayerBase<SoundCloudMusic>, ILastException, ILoadingText
 	{
 		internal const string __CLIENTID__ = "32c6d127f78f111e92213bd0ba364199";
@@ -21,6 +22,10 @@ namespace MetaMusic.Players
 		public bool HasThrown => Source.HasThrown;
 
 		public string LoadingText => Source.LoadingText;
+
+		public bool HasLoaded => Source.HasLoaded;
+
+		public override string RegistryName => nameof(SoundCloudPlayer);
 
 		public SoundCloudPlayer(WebMusicHelper helper)
 		{
@@ -41,6 +46,26 @@ namespace MetaMusic.Players
 			base.Play(source);
 
 			WebHelper.CurrentVolume = Volume;
+		}
+
+		public override bool CanPlay(string sourceUri)
+		{
+			return sourceUri.ToLower().StartsWithAny("http://soundcloud.com", "https://soundcloud.com");
+		}
+
+		public override IMusicSource MakeSource(string source)
+		{
+			return new SoundCloudMusic(source, WebHelper);
+		}
+
+		public override double GetVolume(PlayerSettings settings)
+		{
+			return settings.VolumeSoundCloud;
+		}
+
+		public override void SetVolume(PlayerSettings settings, double volume)
+		{
+			settings.VolumeSoundCloud = volume;
 		}
 	}
 }

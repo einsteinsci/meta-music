@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,17 +20,6 @@ namespace MetaMusic
 {
 	public static class Util
 	{
-		[StructLayout(LayoutKind.Sequential)]
-		internal struct Win32Point
-		{
-			public int X;
-			public int Y;
-		};
-
-		[DllImport("user32.dll")]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		internal static extern bool GetCursorPos(ref Win32Point pt);
-
 		public static string GetDurationString(this IMusicSource source)
 		{
 			if (source == null)
@@ -37,7 +27,7 @@ namespace MetaMusic
 				return "No file playing.";
 			}
 
-			return "{0:mm\\:ss} / {1}".Fmt(source.Position, source.Duration?.ToString("mm\\:ss") ?? "???");
+			return "{0:mm\\:ss} / {1}".Fmt(source.Position, source.Duration?.ToString("mm\\:ss") ?? "-:--");
 		}
 
 		public static ImageSource LoadImage(string path)
@@ -63,14 +53,54 @@ namespace MetaMusic
 
 		public static Point GetMousePosition()
 		{
-			Win32Point w32Mouse = new Win32Point();
-			GetCursorPos(ref w32Mouse);
+			Win32Util.Win32Point w32Mouse = new Win32Util.Win32Point();
+			Win32Util.GetCursorPos(ref w32Mouse);
 			return new Point(w32Mouse.X, w32Mouse.Y);
 		}
 
 		public static Visibility ToVis(this bool b, Visibility onFalse = Visibility.Collapsed)
 		{
 			return b ? Visibility.Visible : onFalse;
+		}
+
+		public static bool StartsWithAny(this string str, params string[] starters)
+		{
+			return starters.Any(str.StartsWith);
+		}
+
+		public static bool MatchesSignature(this MethodInfo method, Type ret, params Type[] paramTypes)
+		{
+			if (method.ReturnType != ret)
+			{
+				return false;
+			}
+
+			ParameterInfo[] pars = method.GetParameters();
+
+			if (pars.Length != paramTypes.Length)
+			{
+				return false;
+			}
+
+			for (int i = 0; i < paramTypes.Length; i++)
+			{
+				if (pars[i].ParameterType != paramTypes[i])
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		public static T PeekOrDefault<T>(this Queue<T> queue)
+		{
+			if (queue.IsEmpty())
+			{
+				return default(T);
+			}
+
+			return queue.Peek();
 		}
 	}
 }

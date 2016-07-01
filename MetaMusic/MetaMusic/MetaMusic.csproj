@@ -93,17 +93,26 @@
     <Compile Include="FlashWindowHelper.cs" />
     <Compile Include="ILastException.cs" />
     <Compile Include="ILoadingText.cs" />
+    <Compile Include="LibraryItem.cs" />
     <Compile Include="MetaMusicLogic.cs" />
     <Compile Include="Players\BrstmPlayer.cs" />
+    <Compile Include="Players\MusicPlayerAttribute.cs" />
+    <Compile Include="Players\PlayerRegistry.cs" />
     <Compile Include="Players\SoundCloudPlayer.cs" />
     <Compile Include="Players\VersatilePlayer.cs" />
     <Compile Include="Playlist.cs" />
     <Compile Include="PlaylistItem.cs" />
+    <Compile Include="Attributes.cs" />
+    <Compile Include="PluginLoader.cs" />
+    <Compile Include="PlayerSettings.cs" />
+    <Compile Include="SongLibrary.cs" />
     <Compile Include="Sources\BrstmMusic.cs" />
+    <Compile Include="Sources\ILoadingMessage.cs" />
     <Compile Include="Sources\SoundCloudMusic.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="WavSoundHelper.cs" />
     <Compile Include="WebMusicHelper.cs" />
+    <Compile Include="Win32Util.cs" />
     <Page Include="Styles\ButtonContentOnly.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

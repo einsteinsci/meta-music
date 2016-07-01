@@ -9,7 +9,7 @@ using MetaMusic.Sources;
 
 namespace MetaMusic.Players
 {
-	public class VersatilePlayer : IMusicPlayer<IMusicSource>, ILoadingText
+	public class VersatilePlayer : IMusicPlayer<IMusicSource>
 	{
 		public FilePlayer StandardFilePlayer
 		{ get; private set; }
@@ -25,6 +25,11 @@ namespace MetaMusic.Players
 
 		public IMusicSource Source
 		{ get; private set; }
+
+		public PlayerRegistry Registry
+		{ get; private set; }
+
+		public string RegistryName => nameof(VersatilePlayer);
 
 		public event EventHandler TitleChanged;
 
@@ -52,6 +57,8 @@ namespace MetaMusic.Players
 			StandardFilePlayer = new FilePlayer(mediaPlayer);
 			SoundCloudPlayer = new SoundCloudPlayer(webHelper);
 			BrstmPlayer = new BrstmPlayer(wavHelper);
+
+			Registry = new PlayerRegistry(this);
 		}
 
 		protected IMusicPlayer getMatchingPlayer(Type sourceType)
@@ -87,7 +94,7 @@ namespace MetaMusic.Players
 				{
 					SoundCloudPlayer.Source.TitleChanged += (s, e) => { TitleChanged?.Invoke(s, e); };
 				}
-				else // if (ActivePlayer is FilePlayer)
+				else
 				{
 					TitleChanged?.Invoke(this, new EventArgs());
 				}
@@ -96,6 +103,13 @@ namespace MetaMusic.Players
 			{
 				ActivePlayer.Resume();
 			}
+		}
+
+		public void LoadAndPlay(string source)
+		{
+			Source = Registry.MakeSource(source);
+
+			Play(Source);
 		}
 
 		void IMusicPlayer.PlaySrc(IMusicSource src)
@@ -124,6 +138,26 @@ namespace MetaMusic.Players
 
 			ActivePlayer = null;
 			Source = null;
+		}
+
+		public bool CanPlay(string sourceUri)
+		{
+			return true;
+		}
+
+		public IMusicSource MakeSource(string sourceUri)
+		{
+			return Registry.MakeSource(sourceUri);
+		}
+
+		public double GetVolume(PlayerSettings settings)
+		{
+			return ActivePlayer?.GetVolume(settings) ?? 0;
+		}
+
+		public void SetVolume(PlayerSettings settings, double volume)
+		{
+			ActivePlayer?.SetVolume(settings, volume);
 		}
 	}
 }
