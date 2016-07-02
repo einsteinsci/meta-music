@@ -36,6 +36,8 @@ namespace MetaMusic.Players
 		{
 			_player = player;
 			_bufferVolume = 1.0;
+
+			_player.MediaEnded += runOnPlayFinished;
 		}
 
 		public void Play(string path)

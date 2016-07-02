@@ -72,8 +72,6 @@ namespace MetaMusic
 
 		private readonly List<string> debugLines = new List<string>();
 
-		private bool _playMode;
-
 		private bool _windowLoaded;
 
 		private bool _seeking;
@@ -170,7 +168,7 @@ namespace MetaMusic
 		{
 			_windowLoaded = true;
 
-			Logic.UpdatePlayBtn(_playMode ? "Pause" : "Play");
+			Logic.UpdatePlayBtn("Play");
 			DebugTimer.Start();
 
 			Logic.LoadUISettings();
@@ -224,13 +222,13 @@ namespace MetaMusic
 		}
 
 		private void PrevTrackBtn_OnClick(object sender, RoutedEventArgs e)
-		{ }
+		{
+			Logic.PrevAndPlay();
+		}
 
 		private void PlayBtn_OnClick(object sender, RoutedEventArgs e)
 		{
-			_playMode = !_playMode;
 			Logic.TogglePlay();
-			Logic.UpdatePlayBtn(_playMode ? "Pause" : "Play");
 		}
 
 		private void StopBtn_OnClick(object sender, RoutedEventArgs e)
@@ -239,7 +237,9 @@ namespace MetaMusic
 		}
 
 		private void NextTrackBtn_OnClick(object sender, RoutedEventArgs e)
-		{ }
+		{
+			Logic.NextAndPlay();
+		}
 
 		private void VolumeBtn_OnClick(object sender, RoutedEventArgs e)
 		{

@@ -471,7 +471,7 @@
                   Padding="1,0,0,4"
                   Width="32"
                   Height="32"
-                  ToolTip="Previous Track"
+                  ToolTip="Open File..."
                   Margin="10,0" />
 
           <StackPanel x:Name="__VolumeControls"

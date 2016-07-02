@@ -42,6 +42,8 @@ namespace MetaMusic.Players
 		public SoundCloudPlayer(WebMusicHelper helper)
 		{
 			WebHelper = helper;
+
+			WebHelper.OnPlayFinished += runOnPlayFinished;
 		}
 
 		public void Play(string url)

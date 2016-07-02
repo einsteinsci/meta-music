@@ -27,6 +27,8 @@ namespace MetaMusic.Players
 		bool Muted
 		{ get; set; }
 
+		event EventHandler OnPlayFinished;
+
 		void PlaySrc(IMusicSource source);
 
 		void Resume();

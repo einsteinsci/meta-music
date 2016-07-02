@@ -114,6 +114,7 @@
     <Compile Include="PluginLoader.cs" />
     <Compile Include="PlayerSettings.cs" />
     <Compile Include="SongLibrary.cs" />
+    <Compile Include="RingCollection.cs" />
     <Compile Include="SongState.cs" />
     <Compile Include="Sources\BrstmMusic.cs" />
     <Compile Include="Sources\ILoadingMessage.cs" />

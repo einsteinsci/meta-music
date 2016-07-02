@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,6 +55,8 @@ namespace MetaMusic
 
 		public TimeSpan? SeekPosition
 		{ get; set; }
+
+		public event EventHandler OnPlayFinished;
 
 		private bool _stopped = true;
 
@@ -171,7 +172,7 @@ namespace MetaMusic
 					timer.Start();
 				}
 
-				if (_stopped || _worker.CancellationPending)
+				if (_stopped || _worker.CancellationPending || pcm.Position > pcm.Length)
 				{
 					waveOut.Stop();
 				}
@@ -195,7 +196,7 @@ namespace MetaMusic
 
 					SeekPosition = null;
 				}
-				else
+				else if (!IsPaused)
 				{
 					_worker?.ReportProgress(0, timer.Elapsed);
 				}
@@ -208,6 +209,11 @@ namespace MetaMusic
 			}
 
 			timer.Stop();
+
+			if (pcm.Position > pcm.Length)
+			{
+				OnPlayFinished?.Invoke(this, new EventArgs());
+			}
 		}
 	}
 }

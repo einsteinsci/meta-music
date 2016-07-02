@@ -20,6 +20,13 @@ namespace MetaMusic.Players
 		public abstract bool Muted
 		{ get; set; }
 
+		public event EventHandler OnPlayFinished;
+
+		protected void runOnPlayFinished(object sender, EventArgs e)
+		{
+			OnPlayFinished?.Invoke(sender, e);
+		}
+
 		public virtual void Play(T source)
 		{
 			Source = source;

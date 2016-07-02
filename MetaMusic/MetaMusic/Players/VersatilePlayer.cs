@@ -46,6 +46,8 @@ namespace MetaMusic.Players
 
 		public string RegistryName => nameof(VersatilePlayer);
 
+		public event EventHandler OnPlayFinished;
+
 		public event EventHandler TitleChanged;
 
 		[Obsolete]
@@ -73,6 +75,10 @@ namespace MetaMusic.Players
 			StandardFilePlayer = new FilePlayer(mediaPlayer);
 			SoundCloudPlayer = new SoundCloudPlayer(webHelper);
 			BrstmPlayer = new BrstmPlayer(wavHelper);
+
+			StandardFilePlayer.OnPlayFinished += (s, e) => OnPlayFinished?.Invoke(s, e);
+			SoundCloudPlayer.OnPlayFinished += (s, e) => OnPlayFinished?.Invoke(s, e);
+			BrstmPlayer.OnPlayFinished += (s, e) => OnPlayFinished?.Invoke(s, e);
 
 			Registry = new PlayerRegistry(this);
 		}

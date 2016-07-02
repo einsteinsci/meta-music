@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,7 +11,6 @@ using System.Windows.Media;
 using System.Windows.Threading;
 
 using MetaMusic.Players;
-using MetaMusic.Sources;
 
 using UltimateUtil;
 
@@ -37,7 +37,8 @@ namespace MetaMusic
 
 		public readonly List<Playlist> Playlists = new List<Playlist>();
 
-		public readonly Queue<PlaylistItem> SongQueue = new Queue<PlaylistItem>();
+		public RingCollection<PlaylistItem> SongQueue
+		{ get; private set; }
 
 		public int Rating
 		{
@@ -68,13 +69,15 @@ namespace MetaMusic
 
 		public readonly VersatilePlayer Player;
 
-		public PlaylistItem NowPlaying => SongQueue.PeekOrDefault();
+		public PlaylistItem NowPlaying => SongQueue.CurrentValue;
 
-		public bool _previewingRating;
+		private bool _previewingRating;
 
 		public MetaMusicLogic(MainWindow ui)
 		{
 			UI = ui;
+
+			SongQueue = new RingCollection<PlaylistItem>();
 
 			Settings = PlayerSettings.Load();
 			Library = SongLibrary.Load();
@@ -82,6 +85,16 @@ namespace MetaMusic
 
 			Player = new VersatilePlayer(FileMediaPlayer, WebHelper, WavHelper);
 			Player.TitleChanged += (s, e) => { UpdateTitleBar(); };
+			Player.OnPlayFinished += (s, e) => {
+				Thread thread = new Thread(() => {
+					Thread.Sleep(100);
+					Dispatcher.Invoke(StopAndAdvance);
+					Thread.Sleep(100);
+					PlayCurrentSongInQueue();
+				});
+				thread.Name = "Playback Finish Thread";
+				thread.Start();
+			};
 
 			Timer.Tick += Timer_OnTick;
 			Timer.Start();
@@ -101,6 +114,7 @@ namespace MetaMusic
 
 			UpdateSongUI();
 			UpdateVolume();
+			UpdateQueueUI();
 		}
 
 		public void LoadUISettings()
@@ -158,7 +172,7 @@ namespace MetaMusic
 
 		public void UpdatePlayBtn(string desc)
 		{
-			//Window.PlayBtn.Content = desc;
+			UI.PlayBtn.ToolTip = desc;
 			UI.PlayThumbBtn.Description = desc;
 			UI.Min_PlayBtn.ToolTip = desc;
 
@@ -219,6 +233,35 @@ namespace MetaMusic
 			if (!_previewingRating)
 			{
 				UpdateRatingUI(Rating);
+			}
+		}
+
+		public void UpdateQueueUI()
+		{
+			UI.QueueList.Items.Clear();
+			foreach (PlaylistItem pli in SongQueue)
+			{
+				ListBoxItem lbi = new ListBoxItem {
+					Content = pli.Song.DisplayName,
+					Tag = pli
+				};
+
+				if (NowPlaying == pli)
+				{
+					lbi.IsSelected = true;
+				}
+
+				lbi.Selected += (s, e) => {
+					PlaylistItem tag = (s as ListBoxItem)?.Tag as PlaylistItem;
+
+					if (tag != null)
+					{
+						PlaySongInQueue(tag);
+					}
+					UpdateSongUI();
+				};
+
+				UI.QueueList.Items.Add(lbi);
 			}
 		}
 
@@ -294,18 +337,45 @@ namespace MetaMusic
 
 		public void MakeSongNode(TreeViewItem all, LibraryItem song)
 		{
+			PlaylistItem pli = song.MakePlaylistItem();
+
 			TreeViewItem songNode = new TreeViewItem
 			{
 				Header = song.DisplayName,
 				ToolTip = song.Source,
-				Tag = song
+				Tag = song,
+				ContextMenu = MakeLibraryContextMenu(pli)
 			};
 
 			songNode.MouseDoubleClick += (s, e) => {
-				PlaySongClearQueue(song.MakePlaylistItem());
+				PlaySongClearQueue(pli);
 			};
 
 			all.Items.Add(songNode);
+		}
+
+		public ContextMenu MakeLibraryContextMenu(PlaylistItem pli)
+		{
+			ContextMenu res = new ContextMenu();
+
+			MenuItem addToQueue = new MenuItem { Header = "Add to Queue" };
+			addToQueue.Click += (s, e) => {
+				SongQueue.Add(pli);
+				if (Player.ActivePlayer?.Source == null)
+				{
+					Player.Stop();
+					Player.LoadAndPlay(NowPlaying.Source);
+					UpdatePlayBtn("Pause");
+					UpdateSongUI();
+				}
+			};
+			res.Items.Add(addToQueue);
+
+			MenuItem playNow = new MenuItem { Header = "Play Now" };
+			playNow.Click += (s, e) => PlaySongClearQueue(pli);
+			res.Items.Add(playNow);
+
+			return res;
 		}
 
 		public void PlaySongClearQueue(PlaylistItem song)
@@ -314,12 +384,110 @@ namespace MetaMusic
 			{
 				Player.Stop();
 			}
-			
-			SongQueue.Clear();
-			SongQueue.Enqueue(song);
-			Player.LoadAndPlay(NowPlaying.Song.Source);
-			UpdatePlayBtn("Pause");
-			UpdateSongUI();
+
+			Thread thread = new Thread(() => {
+				Thread.Sleep(100);
+				Dispatcher.Invoke(() => {
+					SongQueue.Clear();
+					SongQueue.Add(song);
+					Player.LoadAndPlay(NowPlaying.Song.Source);
+					UpdatePlayBtn("Pause");
+					UpdateSongUI();
+				});
+			});
+			thread.Name = "Advance Track Thread";
+			thread.Start();
+		}
+
+		public void PlaySongInQueue(PlaylistItem song)
+		{
+			if (Player.Source != null)
+			{
+				Player.Stop();
+			}
+
+			Thread thread = new Thread(() => {
+				Thread.Sleep(100);
+				Dispatcher.Invoke(() => {
+					bool found = SongQueue.MoveTo(song);
+					if (found)
+					{
+						Player.LoadAndPlay(NowPlaying.Song.Source);
+						UpdatePlayBtn("Pause");
+						UpdateSongUI();
+					}
+				});
+			});
+			thread.Name = "Advance Track Thread";
+			thread.Start();
+		}
+
+		public void NextAndPlay()
+		{
+			if (Player.Source != null)
+			{
+				Player.Stop();
+			}
+
+			Thread thread = new Thread(() => {
+				Thread.Sleep(100);
+				Dispatcher.Invoke(() => {
+					SongQueue.MoveNext();
+					if (SongQueue.CurrentValue != null)
+					{
+						Player.LoadAndPlay(NowPlaying.Song.Source);
+						UpdatePlayBtn("Pause");
+						UpdateSongUI();
+					}
+				});
+			});
+			thread.Name = "Advance Track Thread";
+			thread.Start();
+		}
+
+		public void PrevAndPlay()
+		{
+			if (Player.Source != null)
+			{
+				Player.Stop();
+			}
+
+			Thread thread = new Thread(() => {
+				Thread.Sleep(100);
+				Dispatcher.Invoke(() => {
+					SongQueue.MovePrevious();
+					if (SongQueue.CurrentValue != null)
+					{
+						Player.LoadAndPlay(NowPlaying.Song.Source);
+						UpdatePlayBtn("Pause");
+						UpdateSongUI();
+					}
+				});
+			});
+			thread.Name = "Advance Track Thread";
+			thread.Start();
+		}
+
+		public void PlayCurrentSongInQueue()
+		{
+			if (Player.Source != null)
+			{
+				Player.Stop();
+			}
+
+			if (NowPlaying?.Song != null)
+			{
+				Thread thread = new Thread(() => {
+					Thread.Sleep(100);
+					Dispatcher.Invoke(() => {
+						Player.LoadAndPlay(NowPlaying.Song.Source);
+						UpdatePlayBtn("Pause");
+						UpdateSongUI();
+					});
+				});
+				thread.Name = "Advance Track Thread";
+				thread.Start();
+			}
 		}
 
 		public void ToggleMute()
@@ -455,6 +623,29 @@ namespace MetaMusic
 		public void Stop()
 		{
 			Player.Stop();
+
+			if (SongQueue.Count == 1)
+			{
+				SongQueue.RemoveCurrent();
+			}
+
+			UpdateTitleBar();
+			UpdatePlayBtn("Play");
+		}
+
+		public void StopAndAdvance()
+		{
+			Player.Stop();
+
+			if (SongQueue.Count == 1)
+			{
+				SongQueue.RemoveCurrent();
+			}
+			else
+			{
+				SongQueue.MoveNext();
+			}
+
 			UpdateTitleBar();
 			UpdatePlayBtn("Play");
 		}

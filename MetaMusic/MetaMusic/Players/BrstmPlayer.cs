@@ -39,6 +39,8 @@ namespace MetaMusic.Players
 		public BrstmPlayer(WavSoundHelper helper)
 		{
 			WavHelper = helper;
+
+			WavHelper.OnPlayFinished += runOnPlayFinished;
 		}
 
 		public void Play(string path)
