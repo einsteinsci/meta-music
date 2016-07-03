@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -113,6 +114,19 @@ namespace MetaMusic
 			image.EndInit();
 
 			return image;
+		}
+
+		public static int IndexOf(this ItemCollection coll, Predicate<object> pred)
+		{
+			for (int i = 0; i < coll.Count; i++)
+			{
+				if (pred(coll[i]))
+				{
+					return i;
+				}
+			}
+
+			return -1;
 		}
 	}
 }

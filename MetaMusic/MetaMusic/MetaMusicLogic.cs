@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -18,9 +17,6 @@ namespace MetaMusic
 {
 	public class MetaMusicLogic
 	{
-		public static MetaMusicLogic Instance
-		{ get; private set; }
-
 		public MainWindow UI
 		{ get; private set; }
 
@@ -81,28 +77,35 @@ namespace MetaMusic
 
 			Settings = PlayerSettings.Load();
 			Library = SongLibrary.Load();
-			LoadPlaylists();
+
+			Playlist.LoadAllInFolder(Playlist.PLAYLIST_FOLDER, Playlists);
+			CurrentPlaylist = Playlists.FirstOrDefault();
+
+			foreach (Playlist pl in Playlists)
+			{
+				pl.LinkTo(Library);
+			}
 
 			Player = new VersatilePlayer(FileMediaPlayer, WebHelper, WavHelper);
-			Player.TitleChanged += (s, e) => { UpdateTitleBar(); };
-			Player.OnPlayFinished += (s, e) => {
-				Thread thread = new Thread(() => {
-					Thread.Sleep(100);
-					Dispatcher.Invoke(StopAndAdvance);
-					Thread.Sleep(100);
-					PlayCurrentSongInQueue();
-				});
-				thread.Name = "Playback Finish Thread";
-				thread.Start();
-			};
+			Player.TitleChanged += (s, e) => UpdateTitleBar();
+			Player.OnPlayFinished += Player_OnPlayFinished;
 
 			Timer.Tick += Timer_OnTick;
 			Timer.Start();
 
-			if (Instance == null)
-			{
-				Instance = this;
-			}
+			FillQueueWithPlaylist(CurrentPlaylist);
+		}
+
+		private void Player_OnPlayFinished(object sender, EventArgs e)
+		{
+			Thread thread = new Thread(() => {
+				Thread.Sleep(100);
+				Dispatcher.Invoke(StopAndAdvance);
+				Thread.Sleep(100);
+				PlayCurrentSongInQueue();
+			});
+			thread.Name = "Playback Finish Thread";
+			thread.Start();
 		}
 
 		private void Timer_OnTick(object sender, EventArgs e)
@@ -115,6 +118,7 @@ namespace MetaMusic
 			UpdateSongUI();
 			UpdateVolume();
 			UpdateQueueUI();
+			UpdatePlaylistUI();
 		}
 
 		public void LoadUISettings()
@@ -138,29 +142,6 @@ namespace MetaMusic
 
 			UI.LibraryTree.Items.Clear();
 			UI.LibraryTree.Items.Add(MakeLibraryNode());
-		}
-
-		public void LoadPlaylists()
-		{
-			Playlists.Clear();
-
-			if (!Directory.Exists(Playlist.PLAYLIST_FOLDER))
-			{
-				Directory.CreateDirectory(Playlist.PLAYLIST_FOLDER);
-				return;
-			}
-
-			IEnumerable<string> files = from filepath in Directory.EnumerateFiles(Playlist.PLAYLIST_FOLDER)
-				where filepath.ToLower().EndsWith(".json") select filepath;
-
-			foreach (string f in files)
-			{
-				Playlist list = Playlist.Load(f);
-				if (list != null)
-				{
-					Playlists.Add(list);
-				}
-			}
 		}
 
 		public void UpdateTitleBar()
@@ -238,30 +219,57 @@ namespace MetaMusic
 
 		public void UpdateQueueUI()
 		{
+			ListBoxItem selected = UI.QueueList.SelectedItem as ListBoxItem;
+
 			UI.QueueList.Items.Clear();
 			foreach (PlaylistItem pli in SongQueue)
 			{
-				ListBoxItem lbi = new ListBoxItem {
-					Content = pli.Song.DisplayName,
-					Tag = pli
-				};
+				UI.QueueList.Items.Add(MakeQueueListboxItem(pli));
+			}
 
-				if (NowPlaying == pli)
-				{
-					lbi.IsSelected = true;
-				}
-
-				lbi.Selected += (s, e) => {
-					PlaylistItem tag = (s as ListBoxItem)?.Tag as PlaylistItem;
-
-					if (tag != null)
+			if (selected != null)
+			{
+				UI.QueueList.SelectedIndex = UI.QueueList.Items.IndexOf((obj) => {
+					ListBoxItem lbi = obj as ListBoxItem;
+					if (lbi != null)
 					{
-						PlaySongInQueue(tag);
+						return lbi.Tag == selected.Tag;
 					}
-					UpdateSongUI();
-				};
 
-				UI.QueueList.Items.Add(lbi);
+					return false;
+				});
+			}
+		}
+
+		public void UpdatePlaylistUI()
+		{
+			ListBoxItem selected = UI.PlaylistList.SelectedItem as ListBoxItem;
+
+			UI.PlaylistList.Items.Clear();
+
+			if (CurrentPlaylist == null)
+			{
+				return;
+			}
+
+			foreach (PlaylistItem pli in CurrentPlaylist.Songs)
+			{
+				ListBoxItem lbi = MakePlaylistListboxItem(pli);
+
+				UI.PlaylistList.Items.Add(lbi);
+			}
+
+			if (selected != null)
+			{
+				UI.PlaylistList.SelectedIndex = UI.PlaylistList.Items.IndexOf((obj) => {
+					ListBoxItem lbi = obj as ListBoxItem;
+					if (lbi != null)
+					{
+						return lbi.Tag == selected.Tag;
+					}
+
+					return false;
+				});
 			}
 		}
 
@@ -306,16 +314,13 @@ namespace MetaMusic
 			TreeViewItem playlistsNode = new TreeViewItem {
 				Header = "Playlists",
 				FontSize = 12,
+				IsExpanded = true,
 				FontWeight = FontWeights.Normal
 			};
 
 			foreach (Playlist playlist in Playlists)
 			{
-				TreeViewItem plNode = new TreeViewItem {
-					Header = playlist.Name,
-					Tag = playlist
-				};
-				playlistsNode.Items.Add(plNode);
+				playlistsNode.Items.Add(MakePlaylistNode(playlist));
 			}
 			lib.Items.Add(playlistsNode);
 
@@ -328,14 +333,95 @@ namespace MetaMusic
 
 			foreach (LibraryItem song in Library)
 			{
-				MakeSongNode(all, song);
+				all.Items.Add(MakeSongNode(song));
 			}
 			lib.Items.Add(all);
 
 			return lib;
 		}
 
-		public void MakeSongNode(TreeViewItem all, LibraryItem song)
+		public TreeViewItem MakePlaylistNode(Playlist playlist)
+		{
+			TreeViewItem plNode = new TreeViewItem
+			{
+				Header = playlist.Name,
+				Tag = playlist,
+				ContextMenu = MakeLibraryContextMenu(playlist)
+			};
+			plNode.MouseDoubleClick += (s, e) => {
+				PlayPlaylist(playlist);
+				plNode.IsSelected = true;
+			};
+			plNode.ContextMenuOpening += (s, e) => plNode.IsSelected = true;
+			return plNode;
+		}
+
+		public ListBoxItem MakePlaylistListboxItem(PlaylistItem pli)
+		{
+			ListBoxItem lbi = new ListBoxItem {
+				Content = pli.Song.DisplayName,
+				Tag = pli
+			};
+
+			if (NowPlaying == pli)
+			{
+				lbi.FontWeight = FontWeights.SemiBold;
+			}
+
+			lbi.MouseDoubleClick += (s, e) => {
+				PlaylistItem tag = (s as ListBoxItem)?.Tag as PlaylistItem;
+
+				if (tag != null)
+				{
+					if (!SongQueue.Contains(tag))
+					{
+						SongQueue.Add(tag);
+					}
+
+					PlaySongInQueue(tag);
+				}
+				UpdateSongUI();
+			};
+			return lbi;
+		}
+
+		public ListBoxItem MakeQueueListboxItem(PlaylistItem pli)
+		{
+			ListBoxItem lbi = new ListBoxItem
+			{
+				Content = pli.Song.DisplayName,
+				Tag = pli
+			};
+
+			if (NowPlaying == pli)
+			{
+				lbi.FontWeight = FontWeights.SemiBold;
+			}
+
+			lbi.MouseDoubleClick += (s, e) => {
+				PlaylistItem tag = (s as ListBoxItem)?.Tag as PlaylistItem;
+
+				if (tag != null)
+				{
+					PlaySongInQueue(tag);
+				}
+				UpdateSongUI();
+			};
+			return lbi;
+		}
+
+		public ContextMenu MakeLibraryContextMenu(Playlist list)
+		{
+			ContextMenu res = new ContextMenu();
+
+			MenuItem playPlaylist = new MenuItem { Header = "Play Playlist" };
+			playPlaylist.Click += (s, e) => PlayPlaylist(list);
+			res.Items.Add(playPlaylist);
+
+			return res;
+		}
+
+		public TreeViewItem MakeSongNode(LibraryItem song)
 		{
 			PlaylistItem pli = song.MakePlaylistItem();
 
@@ -346,12 +432,14 @@ namespace MetaMusic
 				Tag = song,
 				ContextMenu = MakeLibraryContextMenu(pli)
 			};
+			songNode.ContextMenuOpening += (s, e) => songNode.IsSelected = true;
 
 			songNode.MouseDoubleClick += (s, e) => {
 				PlaySongClearQueue(pli);
+				songNode.IsSelected = true;
 			};
 
-			all.Items.Add(songNode);
+			return songNode;
 		}
 
 		public ContextMenu MakeLibraryContextMenu(PlaylistItem pli)
@@ -361,12 +449,9 @@ namespace MetaMusic
 			MenuItem addToQueue = new MenuItem { Header = "Add to Queue" };
 			addToQueue.Click += (s, e) => {
 				SongQueue.Add(pli);
-				if (Player.ActivePlayer?.Source == null)
+				if (Player.ActivePlayer == null)
 				{
-					Player.Stop();
-					Player.LoadAndPlay(NowPlaying.Source);
-					UpdatePlayBtn("Pause");
-					UpdateSongUI();
+					PlayCurrentSongInQueue();
 				}
 			};
 			res.Items.Add(addToQueue);
@@ -419,6 +504,52 @@ namespace MetaMusic
 				});
 			});
 			thread.Name = "Advance Track Thread";
+			thread.Start();
+		}
+
+		public void PlayPlaylist(Playlist playlist)
+		{
+			CurrentPlaylist = playlist;
+
+			if (Player.Source != null)
+			{
+				Player.Stop();
+			}
+
+			Thread thread = new Thread(() => {
+				Thread.Sleep(100);
+				Dispatcher.Invoke(() => {
+					SongQueue.Clear();
+					SongQueue.AddRange(CurrentPlaylist.Songs);
+					SongQueue.MoveTo(CurrentPlaylist.CurrentSong);
+					Player.LoadAndPlay(NowPlaying.Song.Source);
+					UpdatePlayBtn("Pause");
+					UpdateSongUI();
+				});
+			});
+			thread.Name = "Start Playlist Thread";
+			thread.Start();
+		}
+
+		public void FillQueueWithPlaylist(Playlist playlist)
+		{
+			CurrentPlaylist = playlist;
+
+			if (Player.Source != null)
+			{
+				Player.Stop();
+			}
+
+			Thread thread = new Thread(() => {
+				Thread.Sleep(100);
+				Dispatcher.Invoke(() => {
+					SongQueue.Clear();
+					SongQueue.AddRange(CurrentPlaylist.Songs);
+					SongQueue.MoveTo(CurrentPlaylist.CurrentSong);
+					UpdateSongUI();
+				});
+			});
+			thread.Name = "Start Playlist Thread";
 			thread.Start();
 		}
 
@@ -644,6 +775,11 @@ namespace MetaMusic
 			else
 			{
 				SongQueue.MoveNext();
+
+				if (CurrentPlaylist != null)
+				{
+					CurrentPlaylist.CurrentSongIndex = CurrentPlaylist.Songs.IndexOf(NowPlaying);
+				}
 			}
 
 			UpdateTitleBar();

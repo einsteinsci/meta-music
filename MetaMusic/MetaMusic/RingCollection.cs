@@ -369,5 +369,13 @@ namespace MetaMusic
 			}
 			return res + "...";
 		}
+
+		public void AddRange(IEnumerable<T> items)
+		{
+			foreach (T t in items)
+			{
+				Add(t);
+			}
+		}
 	}
 }
