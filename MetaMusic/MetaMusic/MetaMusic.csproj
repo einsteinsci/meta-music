@@ -94,6 +94,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GetTextWindow.xaml.cs">
+      <DependentUpon>GetTextWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AddSongWindow.xaml.cs">
+      <DependentUpon>AddSongWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BrstmConvert\VgmstreamConverter.cs" />
     <Compile Include="BrstmConvert\VgmstreamProcess.cs">
       <SubType>Component</SubType>
@@ -123,6 +129,14 @@
     <Compile Include="WavSoundHelper.cs" />
     <Compile Include="WebMusicHelper.cs" />
     <Compile Include="Win32Util.cs" />
+    <Page Include="GetTextWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AddSongWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Styles\ButtonContentOnly.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

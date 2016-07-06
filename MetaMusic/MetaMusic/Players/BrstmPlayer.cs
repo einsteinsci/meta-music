@@ -43,6 +43,11 @@ namespace MetaMusic.Players
 			WavHelper.OnPlayFinished += runOnPlayFinished;
 		}
 
+		public void ResetException()
+		{
+			Source.ResetException();
+		}
+
 		public void Play(string path)
 		{
 			Source = new BrstmMusic(path, WavHelper);

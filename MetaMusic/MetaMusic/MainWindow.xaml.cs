@@ -59,6 +59,8 @@ namespace MetaMusic
 		public const int MIN_MINHEIGHT = 0;
 		public const int FULL_MINHEIGHT = 400;
 
+		public const int TITLE_BAR_HEIGHT = 39;
+
 		public MetaMusicLogic Logic
 		{ get; private set; }
 
@@ -100,7 +102,7 @@ namespace MetaMusic
 		{
 			debugLines.Clear();
 
-			debugLines.Add("Now Playing: " + (Logic.NowPlaying?.Song.DisplayName ?? "-NULL-"));
+			debugLines.Add("Now Playing: " + (Logic.NowPlaying?.LibraryData.DisplayName ?? "-NULL-"));
 			debugLines.Add("BRSTM Volume: " + Logic.Player.BrstmPlayer.WavHelper.CurrentVolume);
 		}
 
@@ -115,13 +117,23 @@ namespace MetaMusic
 
 			MinimalistMenuItem.IsChecked = IsMinimalist;
 
-			MaxHeight = IsMinimalist ? 39.0 : double.PositiveInfinity;
+			MaxHeight = IsMinimalist ? TITLE_BAR_HEIGHT : double.PositiveInfinity;
 			MinHeight = IsMinimalist ? MIN_MINHEIGHT : FULL_MINHEIGHT;
-			Height = IsMinimalist ? 39.0 : LastHeight;
+			Height = IsMinimalist ? TITLE_BAR_HEIGHT : LastHeight;
 			MinimalistBtn.Content = IsMinimalist ? NORMAL_WINDOW : MINIMALIST;
 			IsMaxRestoreButtonEnabled = !IsMinimalist;
 			Topmost = IsMinimalist;
 			MinWidth = IsMinimalist ? MIN_MINWIDTH : FULL_MINWIDTH;
+
+			if (!IsMinimalist)
+			{
+				Top = Math.Max(0, Top - Height + TITLE_BAR_HEIGHT);
+			}
+			else
+			{
+				double taskbarY = SystemParameters.MaximizedPrimaryScreenHeight;
+				Top = Math.Min(taskbarY, Top + LastHeight - TITLE_BAR_HEIGHT);
+			}
 
 			MainGrid.Visibility = (!IsMinimalist).ToVis();
 			Min_FlowControlPanel.Visibility = IsMinimalist.ToVis();
@@ -136,19 +148,18 @@ namespace MetaMusic
 
 		public void UpdateMinimalistControlsVisibility(double width)
 		{
+			SongState state = SongState.Load(Logic.Player.Source, Logic.NowPlaying);
+
 			Min_ProgressSlider.Width = width > REDUCE_PROGRESS ? PROGRESS_LARGE : PROGRESS_SMALL;
+			TitleTxt.Text = state.TitleText;
 
 			if (IsMinimalist)
 			{
 				Min_ProgressSlider.Visibility = (width > HIDE_PROGRESS).ToVis();
 				Min_VolumeGrid.Visibility = (width > HIDE_VOLUME).ToVis();
-				Title = width > HIDE_SONGNAME ? (Logic.NowPlaying?.Song.DisplayName ?? "") : "";
+				TitleTxt.Visibility = (width > HIDE_SONGNAME).ToVis();
 				Min_ProgressSeparator.Visibility = (width > HIDE_SONGNAME).ToVis();
 				Min_FlowControlPanel.Visibility = (width > HIDE_CONTROLS).ToVis();
-			}
-			else
-			{
-				Title = Logic.NowPlaying?.Song.DisplayName ?? "";
 			}
 		}
 

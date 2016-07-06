@@ -46,6 +46,11 @@ namespace MetaMusic.Players
 			WebHelper.OnPlayFinished += runOnPlayFinished;
 		}
 
+		public void ResetException()
+		{
+			Source.ResetException();
+		}
+
 		public void Play(string url)
 		{
 			Source = new SoundCloudMusic(url, WebHelper);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -69,6 +70,12 @@ namespace MetaMusic
 			CurrentVolume = 1.0f;
 		}
 
+		public void ResetException()
+		{
+			LastException = null;
+			HasThrown = false;
+		}
+
 		public void LoadFromPath(string path)
 		{
 			FilePath = path;
@@ -92,7 +99,15 @@ namespace MetaMusic
 		{
 			if (IsLoaded)
 			{
-				_worker.RunWorkerAsync();
+				try
+				{
+					_worker.RunWorkerAsync();
+				}
+				catch (InvalidOperationException ex)
+				{
+					HasThrown = true;
+					LastException = ex;
+				}
 			}
 
 			_onPlayStart = onPlayStart;
@@ -131,18 +146,26 @@ namespace MetaMusic
 			{
 				return;
 			}
-			
-			_onPlayStart();
-			
-			using (WaveChannel32 pcm = new WaveChannel32(new WaveFileReader(FilePath)))
-			{
-				Duration = pcm.TotalTime;
 
-				using (WaveOut waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
+			try
+			{
+				using (WaveFileReader fs = new WaveFileReader(FilePath))
 				{
-					_playSoundStream(waveOut, pcm);
+					_onPlayStart();
+
+					using (WaveChannel32 pcm = new WaveChannel32(fs))
+					{
+						Duration = pcm.TotalTime;
+
+						using (WaveOut waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
+						{
+							_playSoundStream(waveOut, pcm);
+						}
+					}
 				}
 			}
+			catch (IOException)
+			{ }
 		}
 
 		private void _playSoundStream(WaveOut waveOut, WaveChannel32 pcm)
@@ -158,6 +181,8 @@ namespace MetaMusic
 			waveOut.Init(pcm);
 			pcm.Volume = CurrentVolume;
 			waveOut.Play();
+
+			_onPlayStart();
 			
 			while (waveOut.PlaybackState == PlaybackState.Playing || waveOut.PlaybackState == PlaybackState.Paused)
 			{

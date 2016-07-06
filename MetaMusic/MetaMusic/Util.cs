@@ -128,5 +128,15 @@ namespace MetaMusic
 
 			return -1;
 		}
+
+		public static string MaxLen(this string str, int len)
+		{
+			if (str == null || str.Length <= len)
+			{
+				return str;
+			}
+
+			return str.Substring(0, len);
+		}
 	}
 }

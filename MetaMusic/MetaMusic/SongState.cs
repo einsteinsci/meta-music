@@ -63,7 +63,7 @@ namespace MetaMusic
 
 			if (song == null && nowPlaying != null)
 			{
-				res.TitleText = nowPlaying.Song.DisplayName;
+				res.TitleText = nowPlaying.LibraryData.DisplayName;
 				return res;
 			}
 
@@ -87,7 +87,10 @@ namespace MetaMusic
 
 				if (!song.Author.IsNullOrEmpty())
 				{
-					res.TitleText = song.Author + " - " + res.TitleText;
+					if (!res.TitleText.StartsWith(song.Author + " - "))
+					{
+						res.TitleText = song.Author + " - " + res.TitleText;
+					}
 				}
 
 				if (song.CoverArtData != null)
@@ -99,7 +102,7 @@ namespace MetaMusic
 			ILoadingText ilt = song as ILoadingText;
 			if (ilt != null)
 			{
-				res.LoadingText = ilt.LoadingText;
+				res.LoadingText = ilt.LoadingText.MaxLen(150);
 			}
 
 			return res;

@@ -101,7 +101,7 @@ namespace MetaMusic
 					library.Add(libi);
 				}
 
-				pli.Song = libi;
+				pli.LibraryData = libi;
 			}
 		}
 

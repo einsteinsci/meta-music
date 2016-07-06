@@ -82,6 +82,12 @@ namespace MetaMusic.Sources
 			WebHelper = helper;
 		}
 
+		public void ResetException()
+		{
+			LastException = null;
+			HasThrown = false;
+		}
+
 		public void Load()
 		{
 			LoadingText = "Loading from SoundCloud...";

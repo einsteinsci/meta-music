@@ -3,24 +3,17 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Media;
-using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 using MetaMusic.BrstmConvert;
-using MetaMusic.Players;
-
-using NAudio.Wave;
-
-using Newtonsoft.Json.Linq;
 
 using UltimateUtil;
 
 namespace MetaMusic.Sources
 {
-	public class BrstmMusic : IMusicSource, ILoadingText
+	public class BrstmMusic : IMusicSource, ILoadingText, ILastException
 	{
 		public WavSoundHelper WavHelper
 		{ get; private set; }
@@ -74,6 +67,12 @@ namespace MetaMusic.Sources
 		{
 			FilePath = permUrl;
 			WavHelper = helper;
+		}
+
+		public void ResetException()
+		{
+			LastException = null;
+			HasThrown = false;
 		}
 
 		public void Load()

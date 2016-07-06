@@ -68,6 +68,12 @@ namespace MetaMusic
 			CurrentVolume = 1.0f;
 		}
 
+		public void ResetException()
+		{
+			LastException = null;
+			HasThrown = false;
+		}
+
 		public void LoadFromUrl(string url)
 		{
 			URL = url;

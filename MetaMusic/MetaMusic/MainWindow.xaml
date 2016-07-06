@@ -11,7 +11,6 @@
                Width="1000"
                MinWidth="710"
                MinHeight="400"
-               Title="Captain-Cool.mp3"
                Closed="MainWindow_OnClosed"
                Loaded="MainWindow_OnLoaded"
                SizeChanged="MainWindow_OnSizeChanged"
@@ -210,6 +209,12 @@
                 IsMoveToPointEnabled="True"
                 ValueChanged="VolumeSlider_OnValueChanged" />
       </Grid>
+      
+      <TextBlock x:Name="TitleTxt"
+                 FontSize="16"
+                 FontWeight="Light"
+                 Text="Captain-Cool.mp3"
+                 Margin="5,0" />
     </m:WindowCommands>
   </m:MetroWindow.LeftWindowCommands>
 
@@ -296,13 +301,13 @@
                      Margin="5,0,5,8" />
           <TextBlock x:Name="LoadingMessageTxt"
                      Grid.Column="2"
-                     Visibility="Collapsed"
-                     VerticalAlignment="Bottom"
-                     Text="Loading..."
-                     FontSize="16"
+                     Visibility="Visible"
+                     VerticalAlignment="Center"
+                     FontSize="10"
                      FontWeight="Light"
                      Foreground="{DynamicResource IdealForegroundDisabledBrush}"
-                     Margin="5,0,5,8" />
+                     Margin="5,4,5,0"
+                     FontStyle="Italic" />
           <Button x:Name="SoundCloudLogoBtn"
                   Grid.Column="4"
                   VerticalAlignment="Center"
@@ -536,6 +541,12 @@
                 Margin="5,5,0,5"
                 BorderThickness="1"
                 BorderBrush="{DynamicResource TextBoxMouseOverBorderBrush}">
+        <TreeView.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ContentPresenter, AncestorLevel=1}}" />
+          </ItemsPanelTemplate>
+        </TreeView.ItemsPanel>
+        
         <TreeViewItem FontSize="14"
                       FontWeight="SemiBold"
                       Header="Library" />

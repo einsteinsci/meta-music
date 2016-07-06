@@ -9,5 +9,7 @@ namespace MetaMusic
 
 		bool HasThrown
 		{ get; }
+
+		void ResetException();
 	}
 }

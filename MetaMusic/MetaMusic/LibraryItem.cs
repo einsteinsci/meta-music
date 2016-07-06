@@ -11,7 +11,7 @@ using UltimateUtil;
 namespace MetaMusic
 {
 	[JsonObject(MemberSerialization.OptIn)]
-	public class LibraryItem
+	public class LibraryItem : IEquatable<LibraryItem>
 	{
 		[JsonProperty]
 		public string Source
@@ -59,7 +59,59 @@ namespace MetaMusic
 
 		public PlaylistItem MakePlaylistItem()
 		{
-			return new PlaylistItem { Song = this, Source = Source };
+			return new PlaylistItem { LibraryData = this, Source = Source };
+		}
+
+		public bool Equals(LibraryItem lbi)
+		{
+			if ((object)lbi == null)
+			{
+				return false;
+			}
+
+			return lbi.Source == Source;
+		}
+
+		public override bool Equals(object obj)
+		{
+			LibraryItem lbi = obj as LibraryItem;
+			if (lbi != null)
+			{
+				return lbi.Equals(this);
+			}
+
+			return false;
+		}
+
+		public override int GetHashCode()
+		{
+			// ReSharper disable once NonReadonlyMemberInGetHashCode
+			return Source.GetHashCode();
+		}
+
+		public override string ToString()
+		{
+			return DisplayName;
+		}
+
+		public static bool operator==(LibraryItem a, LibraryItem b)
+		{
+			if ((object)a != null)
+			{
+				return a.Equals(b);
+			}
+
+			return (object)b == null;
+		}
+
+		public static bool operator!=(LibraryItem a, LibraryItem b)
+		{
+			if ((object)a != null)
+			{
+				return !a.Equals(b);
+			}
+
+			return (object)b != null;
 		}
 	}
 }
